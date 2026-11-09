@@ -354,8 +354,8 @@ export default {
     formErrName: 'Vyplňte prosím jméno a příjmení.',
     formErrEmail: 'Zadejte prosím platnou e-mailovou adresu.',
     formErrMessage: 'Napište prosím krátkou zprávu.',
-    formErrSummary: 'Formulář obsahuje chyby:',
-    formSuccess: 'Děkujeme, zpráva byla odeslána. Ozveme se vám co nejdříve.',
+    formErrPhone: 'Zadejte telefon jen číslicemi, např. +420 601 221 551.',
+    formSuccess: 'Děkujeme, zpráva byla odeslána. Potvrzení jsme vám poslali e-mailem.',
     formError:
       'Zprávu se nepodařilo odeslat. Zkuste to prosím znovu, nebo nám napište přímo na info@vila-scala.cz.',
     formSending: 'Odesílám…',

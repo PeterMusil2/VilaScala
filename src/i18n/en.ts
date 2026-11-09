@@ -356,8 +356,8 @@ const en: typeof cs = {
     formErrName: 'Please enter your full name.',
     formErrEmail: 'Please enter a valid email address.',
     formErrMessage: 'Please write a short message.',
-    formErrSummary: 'The form has errors:',
-    formSuccess: 'Thank you, your message has been sent. We will get back to you soon.',
+    formErrPhone: 'Please enter the phone number in digits, e.g. +420 601 221 551.',
+    formSuccess: 'Thank you, your message has been sent. We have emailed you a confirmation.',
     formError:
       'Your message could not be sent. Please try again, or write to us directly at info@vila-scala.cz.',
     formSending: 'Sending…',

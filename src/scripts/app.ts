@@ -261,14 +261,14 @@ function initContactForm() {
   const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
   if (!form) return;
 
-  const summary = form.querySelector<HTMLElement>('[data-form-errors]');
-  const summaryList = form.querySelector<HTMLElement>('[data-form-errors-list]');
   const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
   const toastBox = document.querySelector<HTMLElement>('[data-toast-box]');
   const toastText = toastBox?.querySelector<HTMLElement>('[data-toast-text]');
   const toastIcon = toastBox?.querySelector<HTMLElement>('[data-toast-icon]');
   let toastTimer: number | undefined;
   let sending = false;
+  // Time since the form appeared; the server treats very fast submits as bots.
+  const shownAt = performance.now();
 
   // Popover API puts the toast in the top layer; fall back to `hidden` without it.
   const hasPopover = typeof toastBox?.showPopover === 'function';
@@ -304,14 +304,49 @@ function initContactForm() {
     if (ev.key === 'Escape' && isToastOpen()) hideToast();
   });
 
-  const setFieldError = (field: HTMLInputElement | HTMLTextAreaElement, message: string | null) => {
-    const errorEl = form.querySelector<HTMLElement>(`[data-error-for="${field.name}"]`);
-    field.setAttribute('aria-invalid', message ? 'true' : 'false');
-    if (errorEl) {
-      errorEl.textContent = message ?? '';
-      errorEl.hidden = !message;
-    }
+  /*
+   * Inline validation: each message sits under its own field. A field is
+   * checked when the person leaves it after typing, re-checked live while it
+   * shows an error (so the message clears the moment it's fixed), and all are
+   * checked on submit.
+   */
+  type FieldName = 'name' | 'email' | 'phone' | 'message';
+  const rules: Record<FieldName, (value: string, field: HTMLInputElement | HTMLTextAreaElement) => boolean> = {
+    name: (v) => v.length > 1,
+    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v),
+    phone: (_v, field) => field.validity.valid,
+    message: (v) => v.length > 4,
   };
+  const fieldNames = Object.keys(rules) as FieldName[];
+  const getField = (name: FieldName) =>
+    form.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${name}"]`);
+
+  const validateField = (name: FieldName) => {
+    const field = getField(name);
+    if (!field) return true;
+    const valid = rules[name](field.value.trim(), field);
+    const message = valid ? '' : (form.dataset[`err${name[0].toUpperCase()}${name.slice(1)}`] ?? '');
+    const errorEl = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+    field.setAttribute('aria-invalid', valid ? 'false' : 'true');
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.hidden = valid;
+    }
+    return valid;
+  };
+
+  const dirty = new Set<FieldName>();
+  for (const name of fieldNames) {
+    const field = getField(name);
+    if (!field) continue;
+    field.addEventListener('input', () => {
+      dirty.add(name);
+      if (field.getAttribute('aria-invalid') === 'true') validateField(name);
+    });
+    field.addEventListener('blur', () => {
+      if (dirty.has(name)) validateField(name);
+    });
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -324,42 +359,10 @@ function initContactForm() {
     const unit = String(data.get('unit') ?? '').trim();
     const message = String(data.get('message') ?? '').trim();
 
-    const errors: { field: string; message: string }[] = [];
-    const check = (
-      selector: string,
-      valid: boolean,
-      messageKey: 'name' | 'email' | 'message',
-    ) => {
-      const field = form.querySelector<HTMLInputElement>(`[name="${selector}"]`);
-      if (!field) return;
-      const msg = valid ? null : (form.dataset[`err${messageKey[0].toUpperCase()}${messageKey.slice(1)}`] ?? '');
-      setFieldError(field, msg);
-      if (msg) errors.push({ field: selector, message: msg });
-    };
-
-    check('name', name.length > 1, 'name');
-    check('email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email), 'email');
-    check('message', message.length > 4, 'message');
-
-    if (summary && summaryList) {
-      summaryList.innerHTML = '';
-      summary.hidden = errors.length === 0;
-      for (const err of errors) {
-        const li = document.createElement('li');
-        const a = document.createElement('a');
-        a.href = `#field-${err.field}`;
-        a.textContent = err.message;
-        a.addEventListener('click', (ev) => {
-          ev.preventDefault();
-          form.querySelector<HTMLElement>(`[name="${err.field}"]`)?.focus();
-        });
-        li.append(a);
-        summaryList.append(li);
-      }
-    }
-
-    if (errors.length) {
-      summary?.focus();
+    const invalid = fieldNames.filter((n) => !validateField(n));
+    if (invalid.length) {
+      // The message under the field is linked via aria-describedby, so focus announces it.
+      getField(invalid[0])?.focus();
       return;
     }
 
@@ -382,6 +385,7 @@ function initContactForm() {
           unit,
           message,
           website: String(data.get('website') ?? ''),
+          elapsed: Math.round(performance.now() - shownAt),
           subject: form.dataset.subject ?? 'Vila SCALA',
           locale: form.dataset.locale,
         }),
@@ -390,9 +394,10 @@ function initContactForm() {
       if (!res.ok || !result?.ok) throw new Error(`HTTP ${res.status}`);
 
       form.reset();
+      dirty.clear();
       form
         .querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[aria-invalid]')
-        .forEach((field) => field.setAttribute('aria-invalid', 'false'));
+        .forEach((field) => field.removeAttribute('aria-invalid'));
       showToast('success', form.dataset.msgSuccess ?? '');
     } catch {
       showToast('error', form.dataset.msgError ?? '');

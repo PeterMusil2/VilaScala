@@ -12,7 +12,7 @@ const copy = tu(locale);
 const c = dict.contact;
 
 const fieldBase =
-  'mt-2 block min-h-12 w-full rounded-card border border-line-strong bg-elevated px-4 py-3 text-base text-text transition-colors duration-200 placeholder:text-muted/70 hover:border-accent/60 aria-[invalid=true]:border-[color:var(--color-status-soon)]';
+  'field mt-2 block min-h-12 w-full rounded-card border border-line-strong bg-elevated px-4 py-3 text-base text-text transition-colors duration-200 placeholder:text-muted/70 hover:border-accent/60';
 ---
 
 <div class="reveal">
@@ -30,6 +30,7 @@ const fieldBase =
     data-err-name={c.formErrName}
     data-err-email={c.formErrEmail}
     data-err-message={c.formErrMessage}
+    data-err-phone={c.formErrPhone}
     data-locale={locale}
     data-msg-success={c.formSuccess}
     data-msg-error={c.formError}
@@ -39,20 +40,6 @@ const fieldBase =
     novalidate
     class="mt-8 grid gap-6"
   >
-    <!-- Error summary: announced, focusable, and links to the offending field. -->
-    <div
-      data-form-errors
-      hidden
-      tabindex="-1"
-      role="alert"
-      class="rounded-card border border-[color:var(--color-status-soon)] bg-surface p-4"
-    >
-      <p class="font-medium">{c.formErrSummary}</p>
-      <ul data-form-errors-list class="mt-2 grid gap-1 text-sm">
-        <li></li>
-      </ul>
-    </div>
-
     <div class="grid gap-6 sm:grid-cols-2">
       <p>
         <label for="field-name" class="text-sm font-medium">
@@ -65,10 +52,13 @@ const fieldBase =
           type="text"
           autocomplete="name"
           required
+          minlength="2"
+          maxlength="120"
+          placeholder=" "
           aria-describedby="err-name"
           class={fieldBase}
         />
-        <span id="err-name" data-error-for="name" hidden class="mt-1.5 block text-sm text-[color:var(--color-status-soon)]"></span>
+        <span id="err-name" data-error-for="name" hidden class="field-error mt-1.5 block text-sm"></span>
       </p>
 
       <p>
@@ -83,10 +73,12 @@ const fieldBase =
           inputmode="email"
           autocomplete="email"
           required
+          maxlength="200"
+          placeholder=" "
           aria-describedby="err-email"
           class={fieldBase}
         />
-        <span id="err-email" data-error-for="email" hidden class="mt-1.5 block text-sm text-[color:var(--color-status-soon)]"></span>
+        <span id="err-email" data-error-for="email" hidden class="field-error mt-1.5 block text-sm"></span>
       </p>
 
       <p>
@@ -97,10 +89,14 @@ const fieldBase =
           type="tel"
           inputmode="tel"
           autocomplete="tel"
-          aria-describedby="hint-phone"
+          pattern="[0-9+ \(\)\-]{6,40}"
+          maxlength="40"
+          placeholder=" "
+          aria-describedby="hint-phone err-phone"
           class={fieldBase}
         />
         <span id="hint-phone" class="mt-1.5 block text-sm text-muted">{c.formPhoneHint}</span>
+        <span id="err-phone" data-error-for="phone" hidden class="field-error mt-1.5 block text-sm"></span>
       </p>
 
       <p>
@@ -134,9 +130,12 @@ const fieldBase =
         name="message"
         rows="6"
         required
+        minlength="5"
+        maxlength="5000"
+        placeholder=" "
         aria-describedby="err-message"
         class={`${fieldBase} resize-y`}></textarea>
-      <span id="err-message" data-error-for="message" hidden class="mt-1.5 block text-sm text-[color:var(--color-status-soon)]"></span>
+      <span id="err-message" data-error-for="message" hidden class="field-error mt-1.5 block text-sm"></span>
     </p>
 
     <!-- Honeypot for bots: hidden from people and assistive tech. -->
@@ -277,6 +276,50 @@ const fieldBase =
     :global(html:has([data-mobile-actions])) .toast {
       inset-block-end: calc(5.25rem + env(safe-area-inset-bottom));
     }
+  }
+
+  /* -------------------------------------------------------- validation --- */
+
+  /*
+   * :user-invalid / :user-valid only match after the person has interacted
+   * with a field (edited and left it, or tried to submit), so an untouched
+   * form never opens covered in red. The JS check on submit still sets
+   * aria-invalid, which gets the same look for browsers without the pseudo
+   * classes and for rules the constraint API can't express.
+   */
+  form {
+    --field-error: light-dark(#b3261e, #ff8a80);
+    --field-valid: light-dark(#2e7d32, #81c995);
+  }
+
+  .field {
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .field:user-invalid,
+  .field[aria-invalid='true'] {
+    border-color: var(--field-error);
+    box-shadow: inset 0 0 0 1px var(--field-error);
+  }
+
+  /* Valid only when there is something in it: an empty optional field stays neutral. */
+  .field:is(input, textarea):user-valid:not(:placeholder-shown, [aria-invalid='true']) {
+    border-color: color-mix(in oklab, var(--field-valid) 70%, var(--color-line-strong));
+  }
+
+  .field:focus-visible:user-invalid {
+    outline-color: var(--field-error);
+  }
+
+  /* The label follows its field, so the state isn't carried by colour on the border alone. */
+  p:has(> .field:user-invalid, > .field[aria-invalid='true']) > label {
+    color: var(--field-error);
+  }
+
+  .field-error {
+    color: var(--field-error);
   }
 
   /* ------------------------------------------------------------ select --- */

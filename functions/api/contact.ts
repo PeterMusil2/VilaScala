@@ -25,6 +25,7 @@ interface Context {
 const DEFAULT_TO = 'info@vila-scala.cz';
 const DEFAULT_FROM = 'Vila SCALA <web@vila-scala.cz>';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const MIN_FILL_MS = 3000;
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -34,6 +35,59 @@ const json = (body: unknown, status = 200) =>
 
 const clean = (value: unknown, max: number) =>
   typeof value === 'string' ? value.replace(/\r/g, '').trim().slice(0, max) : '';
+
+/*
+ * Thank-you email to the visitor. Deliberately fixed text: it never repeats
+ * the name or message they typed, so the form cannot be used to send
+ * arbitrary content to arbitrary addresses from vila-scala.cz.
+ */
+const THANK_YOU = {
+  cs: {
+    subject: 'Děkujeme za zprávu — Vila SCALA',
+    heading: 'Děkujeme za vaši zprávu',
+    body: [
+      'Dobrý den,',
+      'děkujeme, že jste nás kontaktovali. Vaši zprávu jsme v pořádku přijali a ozveme se vám co nejdříve, obvykle do jednoho pracovního dne.',
+      'Pokud budete chtít cokoli doplnit, stačí odpovědět na tento e-mail.',
+    ],
+    signoff: 'S pozdravem',
+    team: 'tým Vila SCALA',
+  },
+  en: {
+    subject: 'Thank you for your message — Vila SCALA',
+    heading: 'Thank you for your message',
+    body: [
+      'Hello,',
+      'thank you for getting in touch. We have received your message and will get back to you as soon as possible, usually within one working day.',
+      'If you would like to add anything, simply reply to this email.',
+    ],
+    signoff: 'Kind regards',
+    team: 'the Vila SCALA team',
+  },
+} as const;
+
+const thankYouEmail = (locale: 'cs' | 'en') => {
+  const t = THANK_YOU[locale];
+  const text = [t.heading, '', ...t.body.flatMap((p) => [p, '']), t.signoff, t.team, '', 'Vila SCALA', 'Veslařská 1039/144, 637 00 Brno-Jundrov', '+420 601 221 551 · https://www.vila-scala.cz'].join('\n');
+  const html = `<!doctype html><html lang="${locale}"><body style="margin:0;background:#f4f1ec;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#14110f;line-height:1.6">
+<div style="max-width:560px;margin:0 auto;padding:32px 20px">
+<div style="background:#fffdfa;border:1px solid #d9d2c6;padding:32px">
+<p style="margin:0 0 24px;font-family:Georgia,'Times New Roman',serif;font-size:22px;letter-spacing:.02em">Vila SCALA</p>
+<h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:600">${t.heading}</h1>
+${t.body.map((p) => `<p style="margin:0 0 14px;font-size:16px">${p}</p>`).join('')}
+<p style="margin:24px 0 0;font-size:16px">${t.signoff}<br><strong>${t.team}</strong></p>
+</div>
+<p style="margin:20px 0 0;font-size:13px;color:#5c544c;text-align:center">Vila SCALA · Veslařská 1039/144, 637 00 Brno-Jundrov<br><a href="tel:+420601221551" style="color:#5c544c">+420 601 221 551</a> · <a href="https://www.vila-scala.cz" style="color:#5c544c">www.vila-scala.cz</a></p>
+</div></body></html>`;
+  return { subject: t.subject, text, html };
+};
+
+const sendEmail = (apiKey: string, payload: Record<string, unknown>) =>
+  fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
 
 /** Single-line values only: stops header-style injection into the subject. */
 const oneLine = (value: string) => value.replace(/[\n\t]+/g, ' ');
@@ -58,8 +112,14 @@ export const onRequestPost = async ({ request, env }: Context): Promise<Response
     return json({ ok: false, error: 'bad_request' }, 400);
   }
 
-  // Honeypot: real visitors never see or fill this field. Pretend success.
-  if (clean(input.website, 200)) {
+  /*
+   * Bot traps. Both answer with a fake success and send nothing (no enquiry,
+   * no thank-you), so a bot learns nothing from the response.
+   * 1. Honeypot: the hidden `website` field is never seen or filled by people.
+   * 2. Timing: nobody fills name, email and a message in under 3 seconds.
+   */
+  const elapsed = Number(input.elapsed);
+  if (clean(input.website, 200) || (Number.isFinite(elapsed) && elapsed < MIN_FILL_MS)) {
     return json({ ok: true });
   }
 
@@ -95,20 +155,16 @@ export const onRequestPost = async ({ request, env }: Context): Promise<Response
 <div style="white-space:pre-wrap;border-left:3px solid #b08d57;padding:8px 16px;background:#f7f3ee">${escapeHtml(message)}</div>
 </body></html>`;
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      authorization: `Bearer ${env.RESEND_API_KEY}`,
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: env.CONTACT_FROM || DEFAULT_FROM,
-      to: [env.CONTACT_TO || DEFAULT_TO],
-      reply_to: `${name} <${email}>`,
-      subject: `${subject} — ${name}`,
-      text,
-      html,
-    }),
+  const from = env.CONTACT_FROM || DEFAULT_FROM;
+  const to = env.CONTACT_TO || DEFAULT_TO;
+
+  const res = await sendEmail(env.RESEND_API_KEY, {
+    from,
+    to: [to],
+    reply_to: `${name} <${email}>`,
+    subject: `${subject} — ${name}`,
+    text,
+    html,
   });
 
   if (!res.ok) {
@@ -116,7 +172,24 @@ export const onRequestPost = async ({ request, env }: Context): Promise<Response
     return json({ ok: false, error: 'send_failed' }, 502);
   }
 
-  return json({ ok: true });
+  // The enquiry is in; a failed thank-you must not turn that into an error.
+  const thanks = thankYouEmail(locale);
+  const thanksRes = await sendEmail(env.RESEND_API_KEY, {
+    from,
+    to: [email],
+    reply_to: to,
+    subject: thanks.subject,
+    text: thanks.text,
+    html: thanks.html,
+  }).catch((err: unknown) => {
+    console.error('Thank-you send failed', err);
+    return null;
+  });
+  if (thanksRes && !thanksRes.ok) {
+    console.error('Thank-you Resend error', thanksRes.status, await thanksRes.text().catch(() => ''));
+  }
+
+  return json({ ok: true, confirmation: !!thanksRes?.ok });
 };
 
 export const onRequest = async (): Promise<Response> =>
