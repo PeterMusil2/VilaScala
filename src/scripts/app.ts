@@ -262,6 +262,11 @@ function initContactForm() {
   if (!form) return;
 
   const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+  // Only the label text changes; the send icon beside it stays in place.
+  const setSubmitLabel = (text: string) => {
+    const label = submit?.querySelector<HTMLElement>('[data-submit-label]');
+    if (label) label.textContent = text;
+  };
   const toastBox = document.querySelector<HTMLElement>('[data-toast-box]');
   const toastText = toastBox?.querySelector<HTMLElement>('[data-toast-text]');
   const toastIcon = toastBox?.querySelector<HTMLElement>('[data-toast-icon]');
@@ -371,7 +376,7 @@ function initContactForm() {
     form.setAttribute('aria-busy', 'true');
     if (submit) {
       submit.disabled = true;
-      submit.textContent = form.dataset.msgSending ?? '…';
+      setSubmitLabel(form.dataset.msgSending ?? '…');
     }
 
     try {
@@ -406,7 +411,7 @@ function initContactForm() {
       form.removeAttribute('aria-busy');
       if (submit) {
         submit.disabled = false;
-        submit.textContent = submit.dataset.label ?? submit.textContent;
+        setSubmitLabel(submit.dataset.label ?? '');
       }
     }
   });
