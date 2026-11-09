@@ -1,5 +1,4 @@
 ---
-import { site } from '../data/site';
 import { units } from '../data/units';
 import { t, tu, type Locale } from '../i18n';
 
@@ -21,7 +20,6 @@ const fieldBase =
 
   <form
     data-contact-form
-    data-to={site.email}
     data-subject={c.formSubject}
     data-label-name={c.formName}
     data-label-email={c.formEmail}
@@ -166,12 +164,6 @@ const fieldBase =
           <path d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
         </svg>
       </button>
-      <a
-        href={`mailto:${site.email}`}
-        class="inline-flex min-h-12 items-center text-sm text-muted underline-offset-4 hover:text-text hover:underline"
-      >
-        {site.email}
-      </a>
     </div>
 
   </form>
