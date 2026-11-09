@@ -26,6 +26,8 @@ const DEFAULT_TO = 'info@vila-scala.cz';
 const DEFAULT_FROM = 'Vila SCALA <web@vila-scala.cz>';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MIN_FILL_MS = 3000;
+/** Tags show up on every email in the Resend dashboard, so sites and kinds can be filtered. */
+const SITE_TAG = { name: 'site', value: 'vila-scala' };
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -165,6 +167,7 @@ export const onRequestPost = async ({ request, env }: Context): Promise<Response
     subject: `${subject} — ${name}`,
     text,
     html,
+    tags: [SITE_TAG, { name: 'type', value: 'enquiry' }],
   });
 
   if (!res.ok) {
@@ -181,6 +184,7 @@ export const onRequestPost = async ({ request, env }: Context): Promise<Response
     subject: thanks.subject,
     text: thanks.text,
     html: thanks.html,
+    tags: [SITE_TAG, { name: 'type', value: 'confirmation' }],
   }).catch((err: unknown) => {
     console.error('Thank-you send failed', err);
     return null;
