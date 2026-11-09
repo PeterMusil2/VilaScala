@@ -341,8 +341,7 @@ export default {
     mapAlt: 'Mapa s vyznačenou polohou Vila SCALA na Veslařské ulici v Brně-Jundrově',
 
     formTitle: 'Kontaktní formulář',
-    formIntro:
-      'Vyplňte formulář a otevře se vám předvyplněná zpráva ve vašem e-mailovém klientovi.',
+    formIntro: 'Vyplňte formulář a ozveme se vám co nejdříve.',
     formName: 'Jméno a příjmení',
     formEmail: 'E-mail',
     formPhone: 'Telefon',
@@ -356,8 +355,11 @@ export default {
     formErrEmail: 'Zadejte prosím platnou e-mailovou adresu.',
     formErrMessage: 'Napište prosím krátkou zprávu.',
     formErrSummary: 'Formulář obsahuje chyby:',
-    formSuccess:
-      'Otevřeli jsme vám předvyplněný e-mail. Pokud se nic nestalo, napište nám prosím přímo na info@vila-scala.cz.',
+    formSuccess: 'Děkujeme, zpráva byla odeslána. Ozveme se vám co nejdříve.',
+    formError:
+      'Zprávu se nepodařilo odeslat. Zkuste to prosím znovu, nebo nám napište přímo na info@vila-scala.cz.',
+    formSending: 'Odesílám…',
+    formClose: 'Zavřít upozornění',
     formSubject: 'Dotaz z webu Vila SCALA',
   },
 

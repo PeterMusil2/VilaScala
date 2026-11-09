@@ -343,7 +343,7 @@ const en: typeof cs = {
     mapAlt: 'Map showing the location of Vila SCALA on Veslařská street in Brno-Jundrov',
 
     formTitle: 'Contact form',
-    formIntro: 'Fill in the form and a pre-filled message will open in your email client.',
+    formIntro: 'Fill in the form and we will get back to you as soon as possible.',
     formName: 'Full name',
     formEmail: 'Email',
     formPhone: 'Phone',
@@ -357,8 +357,11 @@ const en: typeof cs = {
     formErrEmail: 'Please enter a valid email address.',
     formErrMessage: 'Please write a short message.',
     formErrSummary: 'The form has errors:',
-    formSuccess:
-      'We have opened a pre-filled email for you. If nothing happened, please write to info@vila-scala.cz directly.',
+    formSuccess: 'Thank you, your message has been sent. We will get back to you soon.',
+    formError:
+      'Your message could not be sent. Please try again, or write to us directly at info@vila-scala.cz.',
+    formSending: 'Sending…',
+    formClose: 'Close notification',
     formSubject: 'Enquiry from the Vila SCALA website',
   },
 

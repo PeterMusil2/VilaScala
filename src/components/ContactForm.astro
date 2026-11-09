@@ -30,9 +30,12 @@ const fieldBase =
     data-err-name={c.formErrName}
     data-err-email={c.formErrEmail}
     data-err-message={c.formErrMessage}
-    action={`mailto:${site.email}`}
+    data-locale={locale}
+    data-msg-success={c.formSuccess}
+    data-msg-error={c.formError}
+    data-msg-sending={c.formSending}
+    action="/api/contact"
     method="post"
-    enctype="text/plain"
     novalidate
     class="mt-8 grid gap-6"
   >
@@ -132,10 +135,18 @@ const fieldBase =
       <span id="err-message" data-error-for="message" hidden class="mt-1.5 block text-sm text-[color:var(--color-status-soon)]"></span>
     </p>
 
+    <!-- Honeypot for bots: hidden from people and assistive tech. -->
+    <p class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+      <label for="field-website">Website</label>
+      <input id="field-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </p>
+
     <div class="flex flex-wrap items-center gap-4">
       <button
         type="submit"
-        class="inline-flex min-h-12 cursor-pointer items-center justify-center rounded-full bg-accent px-7 text-[0.9375rem] font-medium text-accent-contrast transition-opacity duration-200 hover:opacity-90"
+        data-submit
+        data-label={c.formSubmit}
+        class="inline-flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-accent px-7 text-[0.9375rem] font-medium text-accent-contrast transition-opacity duration-200 hover:opacity-90 disabled:cursor-wait disabled:opacity-60"
       >
         {c.formSubmit}
       </button>
@@ -147,10 +158,65 @@ const fieldBase =
       </a>
     </div>
 
-    <p data-form-status hidden role="status" class="rounded-card border border-line bg-surface p-4 text-sm">
-      {c.formSuccess}
-    </p>
   </form>
 
   <p class="mt-8 border-t border-line pt-6 text-sm text-muted">{copy.sharedNote}</p>
 </div>
+
+<!--
+  Toast alert shown after sending. Lives outside `.reveal`, whose animation
+  would otherwise trap `position: fixed`. Always in the DOM so screen readers
+  pick up the change.
+-->
+<div
+  data-form-toast
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+  class="pointer-events-none fixed inset-x-4 bottom-4 z-80 flex justify-center sm:inset-x-auto sm:right-6 sm:bottom-6"
+>
+  <div
+    data-toast-box
+    hidden
+    class="toast pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-card border border-line bg-elevated p-4 text-[0.9375rem] text-text shadow-[var(--shadow-raise)]"
+  >
+    <span data-toast-icon aria-hidden="true" class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-sm font-bold"></span>
+    <p data-toast-text class="flex-1 leading-snug"></p>
+    <button
+      type="button"
+      data-toast-close
+      aria-label={c.formClose}
+      class="-m-1 grid size-8 shrink-0 cursor-pointer place-items-center rounded-full text-muted hover:text-text"
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .toast[data-variant='success'] [data-toast-icon] {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+  }
+  .toast[data-variant='error'] {
+    border-color: #b3261e;
+  }
+  .toast[data-variant='error'] [data-toast-icon] {
+    background: #b3261e;
+    color: #fff;
+  }
+  .toast:not([hidden]) {
+    animation: toast-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .toast:not([hidden]) {
+      animation: none;
+    }
+  }
+</style>

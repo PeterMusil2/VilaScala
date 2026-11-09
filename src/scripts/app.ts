@@ -263,7 +263,33 @@ function initContactForm() {
 
   const summary = form.querySelector<HTMLElement>('[data-form-errors]');
   const summaryList = form.querySelector<HTMLElement>('[data-form-errors-list]');
-  const status = form.querySelector<HTMLElement>('[data-form-status]');
+  const submit = form.querySelector<HTMLButtonElement>('[data-submit]');
+  const toastBox = document.querySelector<HTMLElement>('[data-toast-box]');
+  const toastText = toastBox?.querySelector<HTMLElement>('[data-toast-text]');
+  const toastIcon = toastBox?.querySelector<HTMLElement>('[data-toast-icon]');
+  let toastTimer: number | undefined;
+  let sending = false;
+
+  const hideToast = () => {
+    if (toastBox) toastBox.hidden = true;
+    window.clearTimeout(toastTimer);
+  };
+
+  const showToast = (variant: 'success' | 'error', text: string) => {
+    if (!toastBox || !toastText || !toastIcon) return;
+    window.clearTimeout(toastTimer);
+    toastBox.dataset.variant = variant;
+    toastIcon.textContent = variant === 'success' ? '✓' : '!';
+    toastText.textContent = text;
+    toastBox.hidden = false;
+    // Errors stay until dismissed; success fades after a while.
+    if (variant === 'success') toastTimer = window.setTimeout(hideToast, 7000);
+  };
+
+  toastBox?.querySelector('[data-toast-close]')?.addEventListener('click', hideToast);
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape' && toastBox && !toastBox.hidden) hideToast();
+  });
 
   const setFieldError = (field: HTMLInputElement | HTMLTextAreaElement, message: string | null) => {
     const errorEl = form.querySelector<HTMLElement>(`[data-error-for="${field.name}"]`);
@@ -274,8 +300,9 @@ function initContactForm() {
     }
   };
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (sending) return;
 
     const data = new FormData(form);
     const name = String(data.get('name') ?? '').trim();
@@ -323,21 +350,46 @@ function initContactForm() {
       return;
     }
 
-    const subject = form.dataset.subject ?? 'Vila SCALA';
-    const bodyLines = [
-      `${form.dataset.labelName}: ${name}`,
-      `${form.dataset.labelEmail}: ${email}`,
-      phone ? `${form.dataset.labelPhone}: ${phone}` : null,
-      unit ? `${form.dataset.labelUnit}: ${unit}` : null,
-      '',
-      message,
-    ].filter(Boolean);
+    sending = true;
+    hideToast();
+    form.setAttribute('aria-busy', 'true');
+    if (submit) {
+      submit.disabled = true;
+      submit.textContent = form.dataset.msgSending ?? '…';
+    }
 
-    const href = `mailto:${form.dataset.to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
-    window.location.href = href;
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', accept: 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          unit,
+          message,
+          website: String(data.get('website') ?? ''),
+          subject: form.dataset.subject ?? 'Vila SCALA',
+          locale: form.dataset.locale,
+        }),
+      });
+      const result = (await res.json().catch(() => null)) as { ok?: boolean } | null;
+      if (!res.ok || !result?.ok) throw new Error(`HTTP ${res.status}`);
 
-    if (status) {
-      status.hidden = false;
+      form.reset();
+      form
+        .querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[aria-invalid]')
+        .forEach((field) => field.setAttribute('aria-invalid', 'false'));
+      showToast('success', form.dataset.msgSuccess ?? '');
+    } catch {
+      showToast('error', form.dataset.msgError ?? '');
+    } finally {
+      sending = false;
+      form.removeAttribute('aria-busy');
+      if (submit) {
+        submit.disabled = false;
+        submit.textContent = submit.dataset.label ?? submit.textContent;
+      }
     }
   });
 }
