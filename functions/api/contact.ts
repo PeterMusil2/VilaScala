@@ -8,13 +8,16 @@
  * Environment (Pages → Settings → Variables and secrets):
  *   RESEND_API_KEY   secret, required — Resend API key (anewstyle.brno team)
  *   CONTACT_TO       optional, defaults to info@vila-scala.cz
- *   CONTACT_FROM     optional, defaults to "Vila SCALA <web@vila-scala.cz>"
+ *   CONTACT_FROM     optional, defaults to "Vila SCALA <web@vila-scala.cz>" (team notification)
+ *   CONTACT_REPLY_FROM optional, defaults to "Vila SCALA <info@vila-scala.cz>" (the visitor's
+ *                    thank-you auto-reply: it comes from the real mailbox, so replies reach it)
  */
 
 interface Env {
   RESEND_API_KEY?: string;
   CONTACT_TO?: string;
   CONTACT_FROM?: string;
+  CONTACT_REPLY_FROM?: string;
 }
 
 interface Context {
@@ -24,6 +27,8 @@ interface Context {
 
 const DEFAULT_TO = 'info@vila-scala.cz';
 const DEFAULT_FROM = 'Vila SCALA <web@vila-scala.cz>';
+/** The visitor's auto-reply is sent as the real mailbox, not a system address. */
+const DEFAULT_REPLY_FROM = 'Vila SCALA <info@vila-scala.cz>';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MIN_FILL_MS = 3000;
 /** Tags show up on every email in the Resend dashboard, so sites and kinds can be filtered. */
@@ -178,7 +183,7 @@ export const onRequestPost = async ({ request, env }: Context): Promise<Response
   // The enquiry is in; a failed thank-you must not turn that into an error.
   const thanks = thankYouEmail(locale);
   const thanksRes = await sendEmail(env.RESEND_API_KEY, {
-    from,
+    from: env.CONTACT_REPLY_FROM || DEFAULT_REPLY_FROM,
     to: [email],
     reply_to: to,
     subject: thanks.subject,
