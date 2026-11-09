@@ -270,9 +270,18 @@ function initContactForm() {
   let toastTimer: number | undefined;
   let sending = false;
 
+  // Popover API puts the toast in the top layer; fall back to `hidden` without it.
+  const hasPopover = typeof toastBox?.showPopover === 'function';
+  if (toastBox && !hasPopover) toastBox.hidden = true;
+
+  const isToastOpen = () =>
+    !!toastBox && (hasPopover ? toastBox.matches(':popover-open') : !toastBox.hidden);
+
   const hideToast = () => {
-    if (toastBox) toastBox.hidden = true;
     window.clearTimeout(toastTimer);
+    if (!toastBox || !isToastOpen()) return;
+    if (hasPopover) toastBox.hidePopover();
+    else toastBox.hidden = true;
   };
 
   const showToast = (variant: 'success' | 'error', text: string) => {
@@ -281,14 +290,18 @@ function initContactForm() {
     toastBox.dataset.variant = variant;
     toastIcon.textContent = variant === 'success' ? '✓' : '!';
     toastText.textContent = text;
-    toastBox.hidden = false;
+    if (hasPopover) {
+      if (!isToastOpen()) toastBox.showPopover();
+    } else {
+      toastBox.hidden = false;
+    }
     // Errors stay until dismissed; success fades after a while.
     if (variant === 'success') toastTimer = window.setTimeout(hideToast, 7000);
   };
 
   toastBox?.querySelector('[data-toast-close]')?.addEventListener('click', hideToast);
   document.addEventListener('keydown', (ev) => {
-    if (ev.key === 'Escape' && toastBox && !toastBox.hidden) hideToast();
+    if (ev.key === 'Escape' && isToastOpen()) hideToast();
   });
 
   const setFieldError = (field: HTMLInputElement | HTMLTextAreaElement, message: string | null) => {

@@ -38,27 +38,32 @@ const schema = [
   },
 ];
 
-const details = [
+/*
+ * Phone and email are links themselves (`valueHref`); only the address keeps
+ * a separate action link, because opening a map is an action, not the value.
+ */
+type Detail = {
+  title: string;
+  lines: string[];
+  valueHref?: string;
+  action?: { href: string; label: string; external: boolean };
+};
+
+const details: Detail[] = [
   {
     title: c.addressTitle,
     lines: [site.street, `${site.district}, ${site.postalCode} ${site.city}`],
-    href: site.mapsUrl,
-    hrefLabel: c.mapCta,
-    external: true,
+    action: { href: site.mapsUrl, label: c.mapCta, external: true },
   },
   {
     title: c.phoneTitle,
     lines: [site.phoneDisplay],
-    href: `tel:${site.phone}`,
-    hrefLabel: dict.cta.call,
-    external: false,
+    valueHref: `tel:${site.phone}`,
   },
   {
     title: c.emailTitle,
     lines: [site.email],
-    href: `mailto:${site.email}`,
-    hrefLabel: dict.cta.email,
-    external: false,
+    valueHref: `mailto:${site.email}`,
   },
 ];
 ---
@@ -94,22 +99,33 @@ const details = [
                   {d.title}
                 </h3>
                 <p class="mt-3 font-display text-2xl">
-                  {d.lines.map((line, li) => (
-                    <>
-                      {li > 0 && <br />}
-                      {line}
-                    </>
-                  ))}
+                  {d.valueHref ? (
+                    <a
+                      href={d.valueHref}
+                      class="inline-flex min-h-11 items-center text-text underline decoration-line-strong decoration-1 underline-offset-[0.2em] transition-colors duration-200 hover:text-accent-text hover:decoration-current"
+                    >
+                      {d.lines[0]}
+                    </a>
+                  ) : (
+                    d.lines.map((line, li) => (
+                      <>
+                        {li > 0 && <br />}
+                        {line}
+                      </>
+                    ))
+                  )}
                 </p>
-                <a
-                  href={d.href}
-                  target={d.external ? '_blank' : undefined}
-                  rel={d.external ? 'noopener noreferrer' : undefined}
-                  class="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-accent-text underline-offset-4 hover:underline"
-                >
-                  {d.hrefLabel}
-                  {d.external && <span class="sr-only"> ({dict.a11y.newWindow})</span>}
-                </a>
+                {d.action && (
+                  <a
+                    href={d.action.href}
+                    target={d.action.external ? '_blank' : undefined}
+                    rel={d.action.external ? 'noopener noreferrer' : undefined}
+                    class="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-accent-text underline-offset-4 hover:underline"
+                  >
+                    {d.action.label}
+                    {d.action.external && <span class="sr-only"> ({dict.a11y.newWindow})</span>}
+                  </a>
+                )}
               </li>
             ))
           }

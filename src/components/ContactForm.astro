@@ -105,18 +105,22 @@ const fieldBase =
 
       <p>
         <label for="field-unit" class="text-sm font-medium">{c.formUnit}</label>
-        <select id="field-unit" name="unit" class={fieldBase}>
-          <option value="">{c.formUnitAny}</option>
-          {
-            units
-              .filter((u) => u.status !== 'sold')
-              .map((u) => (
-                <option value={`${dict.units.labelUnit} ${u.number}`}>
-                  {dict.units.labelUnit} {u.number} — {u.layout}
-                </option>
-              ))
-          }
-        </select>
+        <span class="select-wrap mt-2 block">
+          <select id="field-unit" name="unit" class={`field-select ${fieldBase.replace('mt-2 ', '')}`}>
+            <!-- Read by customizable-select browsers; older parsers drop it. -->
+            <button type="button"><selectedcontent></selectedcontent></button>
+            <option value="">{c.formUnitAny}</option>
+            {
+              units
+                .filter((u) => u.status !== 'sold')
+                .map((u) => (
+                  <option value={`${dict.units.labelUnit} ${u.number}`}>
+                    {dict.units.labelUnit} {u.number} — {u.layout}
+                  </option>
+                ))
+            }
+          </select>
+        </span>
       </p>
     </div>
 
@@ -164,59 +168,270 @@ const fieldBase =
 </div>
 
 <!--
-  Toast alert shown after sending. Lives outside `.reveal`, whose animation
-  would otherwise trap `position: fixed`. Always in the DOM so screen readers
-  pick up the change.
+  Toast alert shown after sending. `popover="manual"` renders it in the top
+  layer, so no ancestor transform (e.g. `.reveal`) can trap it and no z-index
+  is needed. The wrapper is the live region, so screen readers announce it.
 -->
-<div
-  data-form-toast
-  role="status"
-  aria-live="polite"
-  aria-atomic="true"
-  class="pointer-events-none fixed inset-x-4 bottom-4 z-80 flex justify-center sm:inset-x-auto sm:right-6 sm:bottom-6"
->
-  <div
-    data-toast-box
-    hidden
-    class="toast pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-card border border-line bg-elevated p-4 text-[0.9375rem] text-text shadow-[var(--shadow-raise)]"
-  >
-    <span data-toast-icon aria-hidden="true" class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-sm font-bold"></span>
-    <p data-toast-text class="flex-1 leading-snug"></p>
-    <button
-      type="button"
-      data-toast-close
-      aria-label={c.formClose}
-      class="-m-1 grid size-8 shrink-0 cursor-pointer place-items-center rounded-full text-muted hover:text-text"
-    >
+<div role="status" aria-live="polite" aria-atomic="true">
+  <div data-toast-box popover="manual" class="toast">
+    <span data-toast-icon aria-hidden="true" class="toast-icon"></span>
+    <p data-toast-text class="toast-text"></p>
+    <button type="button" data-toast-close aria-label={c.formClose} class="toast-close">
       <span aria-hidden="true">×</span>
     </button>
   </div>
 </div>
 
 <style>
-  .toast[data-variant='success'] [data-toast-icon] {
-    background: var(--color-accent);
-    color: var(--color-accent-contrast);
+  .toast {
+    --toast-tone: var(--color-accent);
+    --toast-on-tone: var(--color-accent-contrast);
+
+    /* Reset the UA popover box (centered, inset: 0) into a corner toast. */
+    position: fixed;
+    inset: auto 1rem 1rem;
+    margin: 0;
+    inline-size: auto;
+    max-inline-size: 28rem;
+    padding: 1rem;
+    border: 1px solid color-mix(in oklab, var(--toast-tone) 45%, var(--color-line));
+    border-radius: var(--radius-card, 0.75rem);
+    background: var(--color-elevated);
+    color: var(--color-text);
+    box-shadow: var(--shadow-raise);
+    font-size: 0.9375rem;
+
+    gap: 0.75rem;
+    align-items: start;
+
+    /* Enter/exit: transition display + overlay so the exit can play. */
+    opacity: 0;
+    translate: 0 0.75rem;
+    transition:
+      opacity 240ms ease,
+      translate 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      display 240ms allow-discrete,
+      overlay 240ms allow-discrete;
   }
-  .toast[data-variant='error'] {
-    border-color: #b3261e;
-  }
-  .toast[data-variant='error'] [data-toast-icon] {
-    background: #b3261e;
-    color: #fff;
-  }
-  .toast:not([hidden]) {
-    animation: toast-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-  @keyframes toast-in {
-    from {
+
+  .toast:popover-open {
+    display: flex;
+    opacity: 1;
+    translate: 0 0;
+
+    @starting-style {
       opacity: 0;
-      transform: translateY(12px);
+      translate: 0 0.75rem;
     }
   }
+
+  .toast[data-variant='error'] {
+    --toast-tone: light-dark(#b3261e, #f2b8b5);
+    --toast-on-tone: light-dark(#fff, #601410);
+  }
+
+  .toast-icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    margin-block-start: 0.0625rem;
+    border-radius: 50%;
+    background: var(--toast-tone);
+    color: var(--toast-on-tone);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .toast-text {
+    flex: 1;
+    line-height: 1.375;
+  }
+
+  .toast-close {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 2rem;
+    block-size: 2rem;
+    margin: -0.25rem;
+    border-radius: 50%;
+    color: var(--color-muted);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-text);
+    }
+  }
+
+  @media (width >= 40rem) {
+    .toast {
+      inset-inline: auto 1.5rem;
+      inset-block-end: 1.5rem;
+    }
+  }
+
+  /* Below lg the sticky mobile action bar owns the bottom edge: sit above it. */
+  @media (width < 64rem) {
+    :global(html:has([data-mobile-actions])) .toast {
+      inset-block-end: calc(5.25rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  /* ------------------------------------------------------------ select --- */
+
+  /*
+   * Core (every browser): drop the native arrow, which ignores padding and
+   * hugs the edge, and draw a chevron on the wrapper. The mask paints with
+   * currentColor, so it follows the light/dark theme.
+   */
+  .select-wrap {
+    position: relative;
+    color: var(--color-muted);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset-block: 0;
+      inset-inline-end: 1rem;
+      inline-size: 1rem;
+      margin-block: auto;
+      block-size: 1rem;
+      background: currentColor;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E")
+        center / contain no-repeat;
+      pointer-events: none;
+      transition: rotate 200ms ease, color 200ms ease;
+    }
+
+    &:hover::after,
+    &:focus-within::after {
+      color: var(--color-text);
+    }
+  }
+
+  .field-select {
+    appearance: none;
+    padding-inline-end: 3rem;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+
+  /*
+   * Enhancement: customizable <select> (appearance: base-select). The picker
+   * becomes stylable, so it matches the form instead of the OS menu, and the
+   * chevron moves into ::picker-icon so it can flip while open.
+   */
+  @supports (appearance: base-select) {
+    .select-wrap::after {
+      display: none;
+    }
+
+    .field-select,
+    .field-select::picker(select) {
+      appearance: base-select;
+    }
+
+    .field-select {
+      display: flex;
+      align-items: center;
+      padding-inline-end: 1rem;
+      white-space: nowrap;
+
+      /* Keep the closed control one line tall, like the inputs beside it. */
+      & > button {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        min-inline-size: 0;
+      }
+
+      & selectedcontent {
+        flex: 1;
+        min-inline-size: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      &::picker-icon {
+        content: '';
+        inline-size: 1rem;
+        block-size: 1rem;
+        margin-inline-start: auto;
+        padding-inline-start: 0.75rem;
+        box-sizing: content-box;
+        background: var(--color-muted);
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E")
+          right center / 1rem no-repeat;
+        transition: rotate 200ms ease;
+      }
+
+      &:open::picker-icon {
+        rotate: 180deg;
+      }
+    }
+
+    .field-select::picker(select) {
+      margin-block: 0.375rem;
+      padding: 0.375rem;
+      border: 1px solid var(--color-line-strong);
+      border-radius: var(--radius-card);
+      background: var(--color-elevated);
+      color: var(--color-text);
+      box-shadow: var(--shadow-raise);
+      opacity: 0;
+      translate: 0 -0.25rem;
+      transition:
+        opacity 160ms ease,
+        translate 160ms ease,
+        display 160ms allow-discrete,
+        overlay 160ms allow-discrete;
+    }
+
+    .field-select:open::picker(select) {
+      opacity: 1;
+      translate: 0 0;
+
+      @starting-style {
+        opacity: 0;
+        translate: 0 -0.25rem;
+      }
+    }
+
+    .field-select option {
+      gap: 0.75rem;
+      padding-block: 0.625rem;
+      padding-inline: 0.75rem;
+      border-radius: var(--radius-card);
+      cursor: pointer;
+
+      &:hover,
+      &:focus-visible {
+        background: var(--color-surface);
+        outline: none;
+      }
+
+      &:checked {
+        color: var(--color-accent-text);
+        font-weight: 500;
+      }
+
+      &::checkmark {
+        order: 1;
+        margin-inline-start: auto;
+        color: var(--color-accent-text);
+      }
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .toast:not([hidden]) {
-      animation: none;
+    .toast,
+    .select-wrap::after,
+    .field-select::picker-icon,
+    .field-select::picker(select) {
+      transition-duration: 0s;
     }
   }
 </style>
