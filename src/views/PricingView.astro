@@ -1,5 +1,5 @@
 ---
-import interiorKitchen from '../assets/images/interior-kitchen.jpg';
+import pageHeroView from '../assets/images/page-hero-view.webp';
 
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Button from '../components/Button.astro';
@@ -28,10 +28,10 @@ const c = dict.pricing;
   overHero
 >
   <Hero
-    image={interiorKitchen}
+    image={pageHeroView}
     alt={locale === 'cs'
-      ? 'Kuchyňský ostrůvek v travertinovém provedení v bytě Vila SCALA'
-      : 'Travertine kitchen island in a Vila SCALA apartment'}
+      ? 'Výhled do zeleně a na okolí od Vily SCALA'
+      : 'View across the greenery and surroundings from Vila SCALA'}
     title={c.title}
     subtitle={c.lead}
   />

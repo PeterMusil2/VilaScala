@@ -10,22 +10,19 @@ const unitsEn: typeof unitsCs = {
     balcony: 'Balcony',
     balcony1: 'Balcony 1',
     balcony2: 'Balcony 2',
-    conservatory: 'Year-round heated conservatory',
   },
 
-  sharedNote: 'Every apartment comes with its own private wine cellar in the rock.',
+  sharedNote: 'Every apartment includes the option to use a unique private wine cellar in the rock.',
   visualisationNote:
     'Visualisations by leading design and architecture studios come with the apartment, so you can picture your future home in a stylish and workable layout.',
 
   '1039-1': {
-    title: 'A 2+kk apartment with two terraces and a conservatory',
-    lead: 'A generous 2+kk apartment of 69 m² for couples and individuals looking for modern living in a quiet spot — with two terraces and a conservatory usable all year round.',
+    title: 'A 2+kk apartment with two terraces',
+    lead: 'A generous 2+kk apartment of 60 m² for couples and individuals looking for modern living in a quiet spot — with two terraces.',
     outdoorNotes: {
       terrace1: 'Ideal for outdoor dining or gardening.',
       terrace2:
         'The perfect place for morning coffee or fresh air straight from the bedroom — and for a hot tub screened from view.',
-      conservatory:
-        'Opening off the living area, a fully heated room in its own right. The conservatory is still under construction, so the exact layout and area may vary slightly.',
     },
     closing:
       'The apartment pairs a modern interior layout with generous outdoor space. Designed by the Brno studio ATAK Design, with several finishes to choose from.',

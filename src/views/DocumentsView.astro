@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 
 import basementPlan from '../assets/floorplans/basement.jpg';
-import corridorGarage from '../assets/images/corridor-garage.jpg';
+import pageHeroView from '../assets/images/page-hero-view.webp';
 
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Button from '../components/Button.astro';
@@ -32,10 +32,10 @@ const c = dict.documents;
   overHero
 >
   <Hero
-    image={corridorGarage}
+    image={pageHeroView}
     alt={locale === 'cs'
-      ? 'Chodba spojující garáž se vstupem do viladomu'
-      : 'Corridor linking the garage to the building entrance'}
+      ? 'Výhled do zeleně a na okolí od Vily SCALA'
+      : 'View across the greenery and surroundings from Vila SCALA'}
     title={c.title}
     subtitle={c.lead}
   />

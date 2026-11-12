@@ -229,6 +229,12 @@
     text-decoration-line: underline;
   }
 
+  @media (min-width: 64rem) {
+    .home-intro-copy p + p {
+      margin-top: 0.75em;
+    }
+  }
+
   /* Underline that draws in from the left on hover/focus. */
   .link-draw {
     background-image: linear-gradient(currentColor, currentColor);

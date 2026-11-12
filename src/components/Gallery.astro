@@ -11,8 +11,8 @@ export interface GalleryItem {
 interface Props {
   locale: Locale;
   items: GalleryItem[];
-  /** Masonry-ish editorial grid, or a plain even grid. */
-  variant?: 'editorial' | 'grid';
+  /** Masonry-ish editorial grid, a plain even grid, or a balanced photo grid. */
+  variant?: 'editorial' | 'grid' | 'balanced';
   /**
    * Photographs are cropped to a common rhythm; drawings must never be —
    * a cropped floor plan is a wrong floor plan.
@@ -46,7 +46,11 @@ const spans = ['sm:col-span-4', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-4
   data-gallery
   class:list={[
     'grid gap-3 sm:gap-4',
-    variant === 'editorial' ? 'sm:grid-cols-6' : 'grid-cols-2 lg:grid-cols-3',
+    variant === 'editorial'
+      ? 'sm:grid-cols-6'
+      : variant === 'balanced'
+        ? 'sm:grid-cols-2 sm:gap-x-5 sm:gap-y-8'
+        : 'grid-cols-2 lg:grid-cols-3',
     className,
   ]}
 >
@@ -75,14 +79,17 @@ const spans = ['sm:col-span-4', 'sm:col-span-2', 'sm:col-span-2', 'sm:col-span-4
             decoding="async"
             quality={62}
             class:list={[
-              'aspect-[4/3] w-full transition-transform duration-500 ease-[var(--ease-out-soft)] motion-reduce:transition-none motion-reduce:group-hover:scale-100',
+              'w-full transition-transform duration-500 ease-[var(--ease-out-soft)] motion-reduce:transition-none motion-reduce:group-hover:scale-100',
+              variant === 'balanced' ? 'h-auto' : 'aspect-[4/3]',
               fit === 'contain'
                 ? 'bg-elevated object-contain p-2 group-hover:scale-[1.015]'
                 : 'object-cover group-hover:scale-[1.03]',
             ]}
           />
         </a>
-        <figcaption class="sr-only">{item.alt}</figcaption>
+        <figcaption class:list={[variant === 'balanced' ? 'mt-3 text-sm text-muted' : 'sr-only']}>
+          {item.alt}
+        </figcaption>
       </figure>
     ))
   }

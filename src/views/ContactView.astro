@@ -1,5 +1,5 @@
 ---
-import exteriorEvening from '../assets/images/exterior-evening.jpg';
+import pageHeroView from '../assets/images/page-hero-view.webp';
 
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Button from '../components/Button.astro';
@@ -78,8 +78,10 @@ const details: Detail[] = [
   overHero
 >
   <Hero
-    image={exteriorEvening}
-    alt={dict.home.heroImageAlt}
+    image={pageHeroView}
+    alt={locale === 'cs'
+      ? 'Výhled do zeleně a na okolí od Vily SCALA'
+      : 'View across the greenery and surroundings from Vila SCALA'}
     title={c.title}
     subtitle={c.lead}
   />

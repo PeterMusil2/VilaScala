@@ -3,8 +3,11 @@ import type { ImageMetadata } from 'astro';
 import { withBase } from '../i18n';
 
 import unit1Living from '../assets/images/unit-1-living.jpg';
+import unit1Preview from '../assets/images/unit-1-preview-all-lights.jpeg';
 import unit2Living from '../assets/images/unit-2-living.jpg';
+import unit2Preview from '../assets/images/unit-2-day-02.webp';
 import unit3Living from '../assets/images/unit-3-living.jpg';
+import unit3Preview from '../assets/images/unit-3-preview-lit.jpeg';
 import unit4Living from '../assets/images/unit-4-living.webp';
 import unit5Entry from '../assets/images/unit-5-entry.jpg';
 
@@ -55,6 +58,8 @@ export interface Unit {
   plan: ImageMetadata;
   gallery: ImageMetadata[];
   pdf: string;
+  /** Matterport tour for this specific unit. */
+  virtualTourUrl?: string;
 }
 
 export const units: Unit[] = [
@@ -65,21 +70,21 @@ export const units: Unit[] = [
     floor: 1,
     floorLabel: { cs: '1. NP', en: 'Ground floor' },
     attic: false,
-    areas: { floor: 69, usable: 65.7, totalUsable: 113.1 },
+    areas: { floor: 60, usable: 56.7, totalUsable: 104.1 },
     outdoor: [
-      { key: 'terrace1', area: 25.6 },
+      { key: 'terrace1', area: 34.6 },
       { key: 'terrace2', area: 12.8 },
-      { key: 'conservatory', area: 9 },
     ],
     outdoorTotal: 47.4,
     status: 'available',
     price: 9_400_000,
     studio: 'ATAK Design',
     studioUrl: 'https://www.designatak.cz',
-    hero: unit1Living,
+    hero: unit1Preview,
     plan: plan1,
     gallery: [unit1Living, kitchen, terrace1, cortenPlanters, viewSvratka, wine1],
     pdf: withBase('/docs/vila-scala-jednotka-1039-1.pdf'),
+    virtualTourUrl: 'https://my.matterport.com/show/?m=wshBMwZgJWX',
   },
   {
     slug: '1039-2',
@@ -94,12 +99,14 @@ export const units: Unit[] = [
       { key: 'terrace2', area: 14.5 },
     ],
     outdoorTotal: 48.1,
-    status: 'soon',
+    status: 'available',
+    price: 9_550_000,
     studio: 'Studio E arch&interiors',
-    hero: unit2Living,
+    hero: unit2Preview,
     plan: plan2,
     gallery: [unit2Living, terrace2, rockGarden, cortenPlanters, wine1],
     pdf: withBase('/docs/vila-scala-jednotka-1039-2.pdf'),
+    virtualTourUrl: 'https://my.matterport.com/show/?m=wshBMwZgJWX',
   },
   {
     slug: '1039-3',
@@ -118,10 +125,11 @@ export const units: Unit[] = [
     price: 15_900_000,
     studio: 'OOOOX (Vila Vanguard) / ATAK Design',
     studioUrl: 'https://www.oooox.com',
-    hero: unit3Living,
+    hero: unit3Preview,
     plan: plan3,
     gallery: [unit3Living, livingDark, kitchen, viewSvratka, wine1],
     pdf: withBase('/docs/vila-scala-jednotka-1039-3.pdf'),
+    virtualTourUrl: 'https://my.matterport.com/show/?m=SEqfAMtKMNL',
   },
   {
     slug: '1039-4',

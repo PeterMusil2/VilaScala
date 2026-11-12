@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 
-import exteriorDay from '../assets/images/exterior-day.jpg';
+import pageHeroView from '../assets/images/page-hero-view.webp';
 import viewSvratka from '../assets/images/view-svratka.jpg';
 import terrace2 from '../assets/images/terrace-2.jpg';
 import rockGarden from '../assets/images/rock-garden.jpg';
@@ -32,10 +32,10 @@ const c = dict.about;
   overHero
 >
   <Hero
-    image={exteriorDay}
+    image={pageHeroView}
     alt={locale === 'cs'
-      ? 'Denní pohled na fasádu viladomu Vila SCALA s balkony a zelení'
-      : 'Daytime view of the Vila SCALA facade with balconies and greenery'}
+      ? 'Výhled do zeleně a na okolí od Vily SCALA'
+      : 'View across the greenery and surroundings from Vila SCALA'}
     title={c.title}
     subtitle={c.lead}
   />

@@ -13,7 +13,7 @@ export const site = {
   geo: { lat: 49.2072, lng: 16.5586 },
   mapsUrl:
     'https://www.google.com/maps/search/?api=1&query=Vesla%C5%99sk%C3%A1%201039%2F144%2C%20Brno-Jundrov',
-  virtualTourUrl: 'https://my.matterport.com/show/?m=HrbBwzj2ryq',
+  virtualTourUrl: 'https://my.matterport.com/show/?m=wshBMwZgJWX',
   foundingYear: 2024,
   lawFirm: 'Krejčí, Rajf & partneři, s.r.o.',
 } as const;

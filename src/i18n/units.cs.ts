@@ -8,22 +8,19 @@ export default {
     balcony: 'Balkon',
     balcony1: 'Balkon 1',
     balcony2: 'Balkon 2',
-    conservatory: 'Celoročně obytná zimní zahrada',
   },
 
-  sharedNote: 'Součástí každého bytu je unikátní soukromá vinotéka ve skále.',
+  sharedNote: 'Součástí každého bytu je možnost využití unikátní soukromé vinotéky ve skále.',
   visualisationNote:
-    'K bytu patří vizualizace od prestižních designérských a architektonických studií, které vám pomohou představit si budoucí bydlení ve stylovém a funkčním provedení.',
+    'K bytu jsou k dispozici vizualizace od prestižních designérských a architektonických studií, které vám pomohou představit si budoucí bydlení ve stylovém a funkčním provedení.',
 
   '1039-1': {
-    title: 'Byt 2+kk se dvěma terasami a zimní zahradou',
-    lead: 'Prostorný byt 2+kk s podlahovou plochou 69 m² pro páry i jednotlivce, kteří hledají moderní bydlení v klidné lokalitě — se dvěma terasami a celoročně obytnou zimní zahradou.',
+    title: 'Byt 2+kk se dvěma terasami',
+    lead: 'Prostorný byt 2+kk s podlahovou plochou 60 m² pro páry i jednotlivce, kteří hledají moderní bydlení v klidné lokalitě — se dvěma terasami.',
     outdoorNotes: {
       terrace1: 'Ideální pro venkovní posezení či zahradničení.',
       terrace2:
         'Perfektní místo pro ranní kávu nebo odpočinek na čerstvém vzduchu přímo z ložnice — i pro vířivku skrytou před zraky okolí.',
-      conservatory:
-        'Výstup z obývací části, plnohodnotný vytápěný prostor. Zimní zahrada je ve výstavbě, přesný půdorys a výměra se proto mohou mírně lišit.',
     },
     closing:
       'Byt spojuje moderní dispozici interiéru s velkorysým prostorem k venkovnímu odpočinku. O návrh se postaralo brněnské studio ATAK Design, na výběr je z několika provedení.',

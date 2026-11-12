@@ -2,9 +2,11 @@
 import { Image } from 'astro:assets';
 
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
 import Button from '../components/Button.astro';
 import Gallery from '../components/Gallery.astro';
 import Hero from '../components/Hero.astro';
+import Panorama360 from '../components/Panorama360.astro';
 import Section from '../components/Section.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import StatusBadge from '../components/StatusBadge.astro';
@@ -14,6 +16,43 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { site } from '../data/site';
 import { units, type Unit } from '../data/units';
 import { fmt, path, t, tu, siteRoot, type Locale } from '../i18n';
+
+import unit1Day from '../assets/images/unit-1-day.jpeg';
+import unit1Day2 from '../assets/images/unit-1-day-2.jpeg';
+import unit1Day3 from '../assets/images/unit-1-day-3.jpeg';
+import unit1Day4 from '../assets/images/unit-1-day-4.jpeg';
+import unit1Day5 from '../assets/images/unit-1-day-05.jpeg';
+import unit1Day6 from '../assets/images/unit-1-day-06.jpeg';
+import unit1Night from '../assets/images/unit-1-night.jpeg';
+import unit1Night2 from '../assets/images/unit-1-night-2.jpeg';
+import unit1Night3 from '../assets/images/unit-1-night-3.jpeg';
+import unit1Night4 from '../assets/images/unit-1-night-4.jpeg';
+import unit1Night5 from '../assets/images/unit-1-night-05.jpeg';
+import unit1Night6 from '../assets/images/unit-1-night-06.jpeg';
+import unit1Panorama from '../assets/images/unit-1-panorama-360.avif';
+import unit1TerraceAnthracite from '../assets/images/unit-1-terrace-anthracite.webp';
+import unit1TerraceCortenConcrete from '../assets/images/unit-1-terrace-corten-concrete.webp';
+import unit2Day1 from '../assets/images/unit-2-day-01.webp';
+import unit2Day2 from '../assets/images/unit-2-day-02.webp';
+import unit2Day3 from '../assets/images/unit-2-day-03.webp';
+import unit2Day4 from '../assets/images/unit-2-day-04.webp';
+import unit2Night1 from '../assets/images/unit-2-night-01.webp';
+import unit2Night2 from '../assets/images/unit-2-night-02.webp';
+import unit2Night3 from '../assets/images/unit-2-night-03.webp';
+import unit2Night4 from '../assets/images/unit-2-night-04.webp';
+import unit3Day1 from '../assets/images/unit-3-day-01.jpeg';
+import unit3Day2 from '../assets/images/unit-3-day-02.jpeg';
+import unit3Day3 from '../assets/images/unit-3-day-03.jpeg';
+import unit3Day4 from '../assets/images/unit-3-day-04.jpeg';
+import unit3Day5 from '../assets/images/unit-3-day-05.jpeg';
+import unit3Day6 from '../assets/images/unit-3-day-06.jpeg';
+import unit3Night1 from '../assets/images/unit-3-night-01.jpeg';
+import unit3Night2 from '../assets/images/unit-3-night-02.jpeg';
+import unit3Night3 from '../assets/images/unit-3-night-03.jpeg';
+import unit3Night4 from '../assets/images/unit-3-night-04.jpeg';
+import unit3Night5 from '../assets/images/unit-3-night-05.jpeg';
+import unit3Night6 from '../assets/images/unit-3-night-06.jpeg';
+import unit3Panorama from '../assets/images/unit-3-panorama-360.avif';
 
 interface Props {
   locale: Locale;
@@ -90,6 +129,58 @@ const galleryItems = unit.gallery.map((src, i) => ({
   src,
   alt: `${heading} — ${c.title} (${i + 1}/${unit.gallery.length})`,
 }));
+
+const unit1Comparisons = [
+  { day: unit1Day, night: unit1Night },
+  { day: unit1Day2, night: unit1Night2 },
+  { day: unit1Day3, night: unit1Night3 },
+  { day: unit1Day4, night: unit1Night4 },
+  { day: unit1Day5, night: unit1Night5 },
+  { day: unit1Day6, night: unit1Night6 },
+];
+
+const unit2Comparisons = [
+  { day: unit2Day1, night: unit2Night1 },
+  { day: unit2Day2, night: unit2Night2 },
+  { day: unit2Day3, night: unit2Night3 },
+  { day: unit2Day4, night: unit2Night4 },
+];
+
+const unit3Comparisons = [
+  { day: unit3Day1, night: unit3Night1 },
+  { day: unit3Day2, night: unit3Night2 },
+  { day: unit3Day3, night: unit3Night3 },
+  { day: unit3Day4, night: unit3Night4 },
+  { day: unit3Day5, night: unit3Night5 },
+  { day: unit3Day6, night: unit3Night6 },
+];
+
+const comparisons =
+  unit.slug === '1039-1'
+    ? unit1Comparisons
+    : unit.slug === '1039-2'
+      ? unit2Comparisons
+      : unit.slug === '1039-3'
+        ? unit3Comparisons
+        : null;
+const panorama = unit.slug === '1039-1' ? unit1Panorama : unit.slug === '1039-3' ? unit3Panorama : null;
+const additionalVisualisations =
+  unit.slug === '1039-1'
+    ? [
+        {
+          src: unit1TerraceCortenConcrete,
+          alt: locale === 'cs'
+            ? 'Terasa bytu 1039/1 s osázenými cortenovými truhlíky a betonovým truhlíkem'
+            : 'Terrace of apartment 1039/1 with planted corten planters and a concrete planter',
+        },
+        {
+          src: unit1TerraceAnthracite,
+          alt: locale === 'cs'
+            ? 'Pohled z bytu 1039/1 na terasu s antracitovou konstrukcí'
+            : 'View from apartment 1039/1 towards the terrace with an anthracite structure',
+        },
+      ]
+    : [];
 ---
 
 <BaseLayout
@@ -164,9 +255,13 @@ const galleryItems = unit.gallery.map((src, i) => ({
             <Button href={unit.pdf} variant="secondary" download class="w-full">
               {dict.cta.downloadPdf}
             </Button>
-            <Button href={site.virtualTourUrl} variant="ghost" external class="w-full">
-              {dict.cta.virtualTour}
-            </Button>
+            {
+              unit.virtualTourUrl && (
+                <Button href={unit.virtualTourUrl} variant="ghost" external class="w-full">
+                  {dict.cta.virtualTour}
+                </Button>
+              )
+            }
           </div>
         </div>
       </aside>
@@ -204,7 +299,58 @@ const galleryItems = unit.gallery.map((src, i) => ({
       eyebrow={heading}
       title={`${dict.units.gallery} ${fmt(dict.units.ofUnit, { unit: unit.number })}`}
     />
-    <Gallery locale={locale} items={galleryItems} class="mt-12" />
+    {
+      comparisons ? (
+        <div class="mt-12 grid gap-5 lg:grid-cols-2 lg:gap-6">
+          {comparisons.map((comparison, i) => (
+            <BeforeAfter
+              before={comparison.day}
+              after={comparison.night}
+              beforeAlt={locale === 'cs' ? `Byt ${unit.number} — denní vizualizace ${i + 1}` : `Apartment ${unit.number} — daytime visualisation ${i + 1}`}
+              afterAlt={locale === 'cs' ? `Byt ${unit.number} — noční vizualizace ${i + 1}` : `Apartment ${unit.number} — night-time visualisation ${i + 1}`}
+              beforeLabel={locale === 'cs' ? 'Den' : 'Day'}
+              afterLabel={locale === 'cs' ? 'Noc' : 'Night'}
+              controlLabel={locale === 'cs' ? `Porovnat denní a noční vizualizaci ${i + 1}` : `Compare daytime and night-time visualisation ${i + 1}`}
+            />
+          ))}
+          {panorama && (
+            <Panorama360
+              src={panorama}
+              label={locale === 'cs' ? `Interaktivní 360° vizualizace bytu ${unit.number}` : `Interactive 360° visualisation of apartment ${unit.number}`}
+              hint={locale === 'cs' ? 'Tažením se rozhlédnete · kolečkem přiblížíte' : 'Drag to look around · scroll to zoom'}
+              fullscreenLabel={locale === 'cs' ? 'Otevřít 360° pohled přes celou obrazovku' : 'Open the 360° view in fullscreen'}
+              fallback={locale === 'cs' ? '360° pohled se v tomto prohlížeči nepodařilo načíst.' : 'The 360° view could not be loaded in this browser.'}
+              class="lg:col-span-2"
+            />
+          )}
+          {additionalVisualisations.length > 0 && (
+            <div class="mt-7 lg:col-span-2 lg:mt-10">
+              <h3 class="text-h2">
+                <span class="reveal-line">
+                  <span>{locale === 'cs' ? `Aktuální stav bytu ${unit.number}` : `Current condition of apartment ${unit.number}`}</span>
+                </span>
+              </h3>
+            </div>
+          )}
+          {additionalVisualisations.map((visualisation) => (
+            <figure class="reveal m-0 aspect-video overflow-hidden rounded-card bg-surface">
+              <Image
+                src={visualisation.src}
+                alt={visualisation.alt}
+                widths={[640, 960, 1400, 1920]}
+                sizes="(min-width: 1024px) 50vw, 92vw"
+                loading="lazy"
+                decoding="async"
+                quality={78}
+                class="size-full object-cover"
+              />
+            </figure>
+          ))}
+        </div>
+      ) : (
+        <Gallery locale={locale} items={galleryItems} class="mt-12" />
+      )
+    }
   </Section>
 
   <!-- Other units -------------------------------------------------------- -->

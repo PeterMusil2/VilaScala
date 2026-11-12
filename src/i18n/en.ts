@@ -59,7 +59,7 @@ const en: typeof cs = {
 
   status: {
     available: 'For sale',
-    soon: 'Sales open October 2026',
+    soon: 'Coming soon',
     sold: 'Sold',
     availableShort: 'Available',
     soonShort: 'Coming soon',
@@ -123,7 +123,7 @@ const en: typeof cs = {
     highlights: [
       {
         title: 'A house in the rock',
-        body: 'The rock runs through the whole building as a design element — from the entrance and corridors to the private wine cellar that comes with every apartment.',
+        body: 'The rock runs through the whole building as a design element — from the entrance and corridors to the unique private wine cellar available for residents to use.',
       },
       {
         title: 'Terraces and views',
@@ -211,7 +211,7 @@ const en: typeof cs = {
   unitsPage: {
     seoTitle: 'Apartments for sale — Vila SCALA, Brno-Jundrov',
     seoDescription:
-      'Five 2+kk and 4+kk apartments in the Vila SCALA villa house on Veslařská street, Brno. Floor areas from 61 to 111 m², terraces, balconies and a private wine cellar in the rock with every apartment.',
+      'Five 2+kk and 4+kk apartments in the Vila SCALA villa house on Veslařská street, Brno. Floor areas from 61 to 111 m², terraces, balconies and the option to use a unique private wine cellar in the rock.',
     title: 'Apartments',
     lead: 'Exclusive living with quality and style at its core',
 
@@ -302,7 +302,7 @@ const en: typeof cs = {
       { name: 'Heating', body: 'underfloor heating' },
       { name: 'Air conditioning', body: 'pipework prepared for installation' },
       { name: 'Terraces and balconies', body: 'designer corten planters filled with greenery' },
-      { name: 'Wine cellar', body: 'a private wine cellar in the rock with every apartment' },
+      { name: 'Wine cellar', body: 'the option to use a unique private wine cellar in the rock' },
     ],
     standardsClosing: 'Approved for use and ready for immediate sale.',
 

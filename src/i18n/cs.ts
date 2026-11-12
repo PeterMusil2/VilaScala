@@ -57,7 +57,7 @@ export default {
 
   status: {
     available: 'K prodeji',
-    soon: 'Prodej zahájen v říjnu 2026',
+    soon: 'Připravujeme',
     sold: 'Prodáno',
     availableShort: 'Volný',
     soonShort: 'Připravujeme',
@@ -121,7 +121,7 @@ export default {
     highlights: [
       {
         title: 'Dům ve skále',
-        body: 'Skála prochází celým domem jako designový prvek — od vstupu přes chodby až po soukromou vinotéku, kterou má každý byt.',
+        body: 'Skála prochází celým domem jako designový prvek — od vstupu přes chodby až po unikátní soukromou vinotéku, kterou mohou obyvatelé bytů využívat.',
       },
       {
         title: 'Terasy a výhledy',
@@ -209,7 +209,7 @@ export default {
   unitsPage: {
     seoTitle: 'Nabídka bytů — Vila SCALA, Brno-Jundrov',
     seoDescription:
-      'Pět bytů 2+kk a 4+kk ve viladomě Vila SCALA na Veslařské ulici v Brně. Podlahové plochy 61–111 m², terasy, balkony a soukromá vinotéka ve skále ke každému bytu.',
+      'Pět bytů 2+kk a 4+kk ve viladomě Vila SCALA na Veslařské ulici v Brně. Podlahové plochy 61–111 m², terasy, balkony a možnost využití unikátní soukromé vinotéky ve skále.',
     title: 'Nabídka bytů',
     lead: 'Exkluzivní bydlení s důrazem na kvalitu a styl',
 
@@ -300,7 +300,7 @@ export default {
       { name: 'Vytápění', body: 'podlahové vytápění' },
       { name: 'Klimatizace', body: 'připravené rozvody pro instalaci' },
       { name: 'Terasy a balkony', body: 'designové cortenové truhlíky osázené zelení' },
-      { name: 'Vinotéka', body: 'soukromá vinotéka ve skále ke každému bytu' },
+      { name: 'Vinotéka', body: 'možnost využití unikátní soukromé vinotéky ve skále' },
     ],
     standardsClosing: 'Zkolaudováno a připraveno k okamžitému prodeji.',
 

@@ -1,0 +1,244 @@
+---
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  label: string;
+  hint: string;
+  fullscreenLabel: string;
+  fallback: string;
+  class?: string;
+}
+
+const { src, label, hint, fullscreenLabel, fallback, class: className = '' } = Astro.props;
+---
+
+<figure
+  data-panorama
+  data-src={src.src}
+  class:list={['panorama reveal relative m-0 aspect-video overflow-hidden rounded-card bg-[#0e0c0b]', className]}
+>
+  <canvas
+    data-panorama-canvas
+    class="size-full touch-none cursor-grab outline-none active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent"
+    role="img"
+    tabindex="0"
+    aria-label={label}
+  ></canvas>
+
+  <div class="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-4 p-4 sm:p-6">
+    <span class="rounded-full bg-[#0e0c0b]/72 px-3 py-1 text-meta font-semibold uppercase text-white backdrop-blur-sm">
+      360°
+    </span>
+  </div>
+
+  <p
+    data-panorama-hint
+    class="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#0e0c0b]/72 px-4 py-2 text-xs font-medium text-white backdrop-blur-sm transition-opacity duration-300 sm:bottom-6 sm:text-sm"
+  >
+    {hint}
+  </p>
+
+  <button
+    data-panorama-fullscreen
+    type="button"
+    class="button-link absolute right-4 top-4 grid size-10 place-items-center rounded-full border border-white/40 bg-[#0e0c0b]/72 text-white backdrop-blur-sm transition-colors hover:bg-[#0e0c0b]/90 sm:right-6 sm:top-6 sm:size-11"
+    aria-label={fullscreenLabel}
+    title={fullscreenLabel}
+  >
+    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5" />
+    </svg>
+  </button>
+
+  <p data-panorama-fallback class="absolute inset-0 hidden place-items-center p-8 text-center text-sm text-white">
+    {fallback}
+  </p>
+</figure>
+
+<script>
+  const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+  document.querySelectorAll<HTMLElement>('[data-panorama]').forEach((root) => {
+    if (root.dataset.ready === 'true') return;
+    root.dataset.ready = 'true';
+
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-panorama-canvas]');
+    const fullscreen = root.querySelector<HTMLButtonElement>('[data-panorama-fullscreen]');
+    const hint = root.querySelector<HTMLElement>('[data-panorama-hint]');
+    const fallback = root.querySelector<HTMLElement>('[data-panorama-fallback]');
+    const imageUrl = root.dataset.src;
+    if (!canvas || !imageUrl) return;
+
+    const gl = canvas.getContext('webgl', { antialias: true, alpha: false });
+    if (!gl) {
+      canvas.classList.add('hidden');
+      fallback?.classList.replace('hidden', 'grid');
+      return;
+    }
+
+    const vertexSource = `
+      attribute vec2 aPosition;
+      void main() {
+        gl_Position = vec4(aPosition, 0.0, 1.0);
+      }
+    `;
+
+    const fragmentSource = `
+      precision highp float;
+      uniform vec2 uResolution;
+      uniform float uYaw;
+      uniform float uPitch;
+      uniform float uFov;
+      uniform sampler2D uTexture;
+
+      void main() {
+        vec2 point = (gl_FragCoord.xy / uResolution) * 2.0 - 1.0;
+        point.x *= uResolution.x / uResolution.y;
+        float scale = tan(uFov * 0.5);
+        vec3 ray = normalize(vec3(point.x * scale, point.y * scale, -1.0));
+
+        float cp = cos(uPitch);
+        float sp = sin(uPitch);
+        ray = vec3(ray.x, ray.y * cp - ray.z * sp, ray.y * sp + ray.z * cp);
+
+        float cy = cos(uYaw);
+        float sy = sin(uYaw);
+        ray = vec3(ray.x * cy + ray.z * sy, ray.y, -ray.x * sy + ray.z * cy);
+
+        float longitude = atan(ray.z, ray.x);
+        float latitude = asin(clamp(ray.y, -1.0, 1.0));
+        vec2 uv = vec2(fract(0.5 + longitude / 6.28318530718), 0.5 - latitude / 3.14159265359);
+        gl_FragColor = texture2D(uTexture, uv);
+      }
+    `;
+
+    const compile = (type: number, source: string) => {
+      const shader = gl.createShader(type);
+      if (!shader) return null;
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      return gl.getShaderParameter(shader, gl.COMPILE_STATUS) ? shader : null;
+    };
+
+    const vertex = compile(gl.VERTEX_SHADER, vertexSource);
+    const fragment = compile(gl.FRAGMENT_SHADER, fragmentSource);
+    const program = gl.createProgram();
+    if (!vertex || !fragment || !program) {
+      fallback?.classList.replace('hidden', 'grid');
+      return;
+    }
+
+    gl.attachShader(program, vertex);
+    gl.attachShader(program, fragment);
+    gl.linkProgram(program);
+    gl.useProgram(program);
+
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+    const position = gl.getAttribLocation(program, 'aPosition');
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+    const resolution = gl.getUniformLocation(program, 'uResolution');
+    const yawUniform = gl.getUniformLocation(program, 'uYaw');
+    const pitchUniform = gl.getUniformLocation(program, 'uPitch');
+    const fovUniform = gl.getUniformLocation(program, 'uFov');
+    const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    let yaw = 1.57;
+    let pitch = 0;
+    let fov = 1.18;
+    let loaded = false;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const width = Math.max(1, Math.round(rect.width * ratio));
+      const height = Math.max(1, Math.round(rect.height * ratio));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+        gl.viewport(0, 0, width, height);
+      }
+    };
+
+    const render = () => {
+      resize();
+      if (!loaded) return;
+      gl.uniform2f(resolution, canvas.width, canvas.height);
+      gl.uniform1f(yawUniform, yaw);
+      gl.uniform1f(pitchUniform, pitch);
+      gl.uniform1f(fovUniform, fov);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+    };
+
+    const image = new Image();
+    image.decoding = 'async';
+    image.onload = () => {
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+      loaded = true;
+      render();
+    };
+    image.onerror = () => fallback?.classList.replace('hidden', 'grid');
+    image.src = imageUrl;
+
+    let pointerId: number | null = null;
+    let lastX = 0;
+    let lastY = 0;
+    canvas.addEventListener('pointerdown', (event) => {
+      pointerId = event.pointerId;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      canvas.setPointerCapture(event.pointerId);
+      hint?.classList.add('opacity-0');
+    });
+    canvas.addEventListener('pointermove', (event) => {
+      if (pointerId !== event.pointerId) return;
+      yaw -= (event.clientX - lastX) * 0.005;
+      pitch = clamp(pitch + (event.clientY - lastY) * 0.005, -1.35, 1.35);
+      lastX = event.clientX;
+      lastY = event.clientY;
+      render();
+    });
+    const release = (event: PointerEvent) => {
+      if (pointerId === event.pointerId) pointerId = null;
+    };
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', release);
+    canvas.addEventListener('wheel', (event) => {
+      event.preventDefault();
+      fov = clamp(fov + event.deltaY * 0.001, 0.55, 1.65);
+      hint?.classList.add('opacity-0');
+      render();
+    }, { passive: false });
+    canvas.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') yaw += 0.08;
+      else if (event.key === 'ArrowRight') yaw -= 0.08;
+      else if (event.key === 'ArrowUp') pitch = clamp(pitch - 0.08, -1.35, 1.35);
+      else if (event.key === 'ArrowDown') pitch = clamp(pitch + 0.08, -1.35, 1.35);
+      else if (event.key === '+' || event.key === '=') fov = clamp(fov - 0.08, 0.55, 1.65);
+      else if (event.key === '-') fov = clamp(fov + 0.08, 0.55, 1.65);
+      else return;
+      event.preventDefault();
+      hint?.classList.add('opacity-0');
+      render();
+    });
+
+    fullscreen?.addEventListener('click', () => {
+      if (document.fullscreenElement === root) document.exitFullscreen();
+      else root.requestFullscreen();
+    });
+    document.addEventListener('fullscreenchange', render);
+    new ResizeObserver(render).observe(root);
+  });
+</script>
+

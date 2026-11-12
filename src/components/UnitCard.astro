@@ -43,7 +43,7 @@ const numberFmt = new Intl.NumberFormat(locale === 'cs' ? 'cs-CZ' : 'en-GB');
       loading={eager ? 'eager' : 'lazy'}
       decoding={eager ? 'sync' : 'async'}
       class:list={[
-        'aspect-[4/3] w-full object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:group-hover:scale-100',
+        'aspect-[4/3] w-full object-cover transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] lg:aspect-[16/9] motion-reduce:transition-none motion-reduce:group-hover:scale-100',
         unit.status === 'sold' && 'saturate-[0.55]',
       ]}
     />
@@ -52,7 +52,7 @@ const numberFmt = new Intl.NumberFormat(locale === 'cs' ? 'cs-CZ' : 'en-GB');
     </div>
   </div>
 
-  <div class="flex flex-1 flex-col p-6">
+  <div class="flex flex-1 flex-col p-6 lg:p-5">
     <p class="text-xs font-semibold tracking-[0.14em] text-muted uppercase">{heading}</p>
 
     <h3 class="mt-2 text-2xl">
@@ -62,7 +62,7 @@ const numberFmt = new Intl.NumberFormat(locale === 'cs' ? 'cs-CZ' : 'en-GB');
       </a>
     </h3>
 
-    <dl class="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+    <dl class="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm lg:mt-4">
       <div>
         <dt class="text-muted">{dict.units.floorArea}</dt>
         <dd class="font-medium">{numberFmt.format(unit.areas.floor)} m²</dd>
@@ -73,11 +73,11 @@ const numberFmt = new Intl.NumberFormat(locale === 'cs' ? 'cs-CZ' : 'en-GB');
       </div>
     </dl>
 
-    <p class="mt-6 flex-1 font-display text-2xl text-accent-text">
+    <p class="mt-6 flex-1 font-display text-2xl text-accent-text lg:mt-4">
       {unit.status === 'soon' ? dict.status.soon : priceLabel}
     </p>
 
-    <p class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-text">
+    <p class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-text lg:mt-3">
       {dict.cta.viewUnit}
       <svg class="size-4 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M5 12h14m0 0-5-5m5 5-5 5" />

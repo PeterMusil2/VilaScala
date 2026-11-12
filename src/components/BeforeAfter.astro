@@ -1,0 +1,100 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  before: ImageMetadata;
+  after: ImageMetadata;
+  beforeAlt: string;
+  afterAlt: string;
+  beforeLabel: string;
+  afterLabel: string;
+  controlLabel: string;
+  class?: string;
+  imageClass?: string;
+}
+
+const {
+  before,
+  after,
+  beforeAlt,
+  afterAlt,
+  beforeLabel,
+  afterLabel,
+  controlLabel,
+  class: className = '',
+  imageClass = '',
+} = Astro.props;
+---
+
+<figure
+  data-before-after
+  class:list={['before-after reveal relative m-0 aspect-video overflow-hidden rounded-card bg-surface', className]}
+  style="--position: 50%;"
+>
+  <Image
+    src={after}
+    alt={afterAlt}
+    widths={[640, 960, 1400, 1920]}
+    sizes="(min-width: 1280px) 76rem, 92vw"
+    loading="lazy"
+    decoding="async"
+    quality={78}
+    class:list={['absolute inset-0 size-full object-cover', imageClass]}
+  />
+
+  <div class="absolute inset-0" style="clip-path: inset(0 calc(100% - var(--position)) 0 0);">
+    <Image
+      src={before}
+      alt={beforeAlt}
+      widths={[640, 960, 1400, 1920]}
+      sizes="(min-width: 1280px) 76rem, 92vw"
+      loading="lazy"
+      decoding="async"
+      quality={78}
+      class:list={['absolute inset-0 size-full object-cover', imageClass]}
+    />
+  </div>
+
+  <span class="absolute left-4 top-4 rounded-full bg-[#0e0c0b]/72 px-3 py-1 text-meta font-semibold uppercase text-white backdrop-blur-sm sm:left-6 sm:top-6">
+    {beforeLabel}
+  </span>
+  <span class="absolute right-4 top-4 rounded-full bg-[#0e0c0b]/72 px-3 py-1 text-meta font-semibold uppercase text-white backdrop-blur-sm sm:right-6 sm:top-6">
+    {afterLabel}
+  </span>
+
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute inset-y-0 z-10 w-px -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(14_12_11_/_0.25)]"
+    style="left: var(--position);"
+  >
+    <span class="absolute left-1/2 top-1/2 grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-white/80 bg-[#0e0c0b]/75 text-white shadow-lg backdrop-blur-sm sm:size-12">
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m9 7-5 5 5 5M15 7l5 5-5 5" />
+      </svg>
+    </span>
+  </div>
+
+  <input
+    data-before-after-range
+    class="comparison-range absolute inset-0 z-20 size-full cursor-ew-resize opacity-0"
+    type="range"
+    min="0"
+    max="100"
+    value="50"
+    aria-label={controlLabel}
+  />
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-before-after]').forEach((comparison) => {
+    const range = comparison.querySelector<HTMLInputElement>('[data-before-after-range]');
+    if (!range || range.dataset.ready === 'true') return;
+
+    range.dataset.ready = 'true';
+    const update = () => comparison.style.setProperty('--position', `${range.value}%`);
+    range.addEventListener('input', update);
+    update();
+  });
+</script>
+

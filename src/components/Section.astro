@@ -13,7 +13,7 @@ const { id, tone = 'default', class: className = '', labelledby } = Astro.props;
   id={id}
   aria-labelledby={labelledby}
   class:list={[
-    'py-20 sm:py-28',
+    'py-16 sm:py-20 lg:py-[clamp(1.75rem,3.75vh,3.5rem)]',
     tone === 'surface' && 'border-y border-line bg-surface',
     className,
   ]}
