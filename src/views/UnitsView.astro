@@ -1,14 +1,12 @@
 ---
 import pageHeroView from '../assets/images/page-hero-view.webp';
-import stoneLight2 from '../assets/images/stone-light-2.jpg';
-import garageLightwall1 from '../assets/images/garage-lightwall-1.jpg';
-import wine2 from '../assets/images/wine-cellar-2.jpg';
 import entranceNumber from '../assets/images/entrance-number.jpg';
-import entranceDoor from '../assets/images/entrance-door.jpg';
-import corridorGarage from '../assets/images/corridor-garage.jpg';
-import interiorKitchen from '../assets/images/interior-kitchen.jpg';
-import atticBath from '../assets/images/interior-attic-bath.jpg';
-import terrace1 from '../assets/images/terrace-1.jpg';
+import unit1Day from '../assets/images/unit-1-day.jpeg';
+import unit1Night from '../assets/images/unit-1-night.jpeg';
+import unit2Day from '../assets/images/unit-2-day-01.webp';
+import unit2Night from '../assets/images/unit-2-night-01.webp';
+import unit3Day from '../assets/images/unit-3-day-01.jpeg';
+import unit3Night from '../assets/images/unit-3-night-01.jpeg';
 
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Button from '../components/Button.astro';
@@ -32,14 +30,12 @@ const c = dict.unitsPage;
 
 const cs = locale === 'cs';
 const galleryItems = [
-  { src: stoneLight2, alt: cs ? 'Prosvětlená kamenná stěna od Anewstyle ve společné chodbě' : 'Backlit stone wall by Anewstyle in the common corridor' },
-  { src: interiorKitchen, alt: cs ? 'Kuchyňský ostrůvek v travertinovém provedení' : 'Travertine kitchen island' },
-  { src: wine2, alt: cs ? 'Vinný regál zasazený do skalní stěny' : 'Wine racking set into the rock face' },
-  { src: terrace1, alt: cs ? 'Terasa s cortenovými truhlíky osázenými zelení' : 'Terrace with corten planters filled with greenery' },
-  { src: atticBath, alt: cs ? 'Koupelna v podkrovním bytě se střešními okny' : 'Bathroom in the attic apartment with roof windows' },
-  { src: garageLightwall1, alt: cs ? 'Garáž s designovým podsvíceným kamenným panelem' : 'Garage with a designer backlit stone panel' },
-  { src: corridorGarage, alt: cs ? 'Chodba spojující garáž se vstupem do domu' : 'Corridor linking the garage to the building entrance' },
-  { src: entranceDoor, alt: cs ? 'Vstupní dveře do bytové jednotky' : 'Entrance door to an apartment' },
+  { src: unit1Day, alt: cs ? 'Byt 1039/1 — denní vizualizace' : 'Apartment 1039/1 — daytime visualisation' },
+  { src: unit1Night, alt: cs ? 'Byt 1039/1 — noční vizualizace' : 'Apartment 1039/1 — night-time visualisation' },
+  { src: unit2Day, alt: cs ? 'Byt 1039/2 — denní vizualizace' : 'Apartment 1039/2 — daytime visualisation' },
+  { src: unit2Night, alt: cs ? 'Byt 1039/2 — noční vizualizace' : 'Apartment 1039/2 — night-time visualisation' },
+  { src: unit3Day, alt: cs ? 'Byt 1039/3 — denní vizualizace' : 'Apartment 1039/3 — daytime visualisation' },
+  { src: unit3Night, alt: cs ? 'Byt 1039/3 — noční vizualizace' : 'Apartment 1039/3 — night-time visualisation' },
   { src: entranceNumber, alt: cs ? 'Vstup do domu s číslem 144 na Veslařské ulici' : 'Entrance to number 144 on Veslařská street' },
 ];
 
@@ -117,6 +113,6 @@ const schema = [
 
   <Section tone="surface" labelledby="units-gallery-title">
     <SectionHeading id="units-gallery-title" index="03" eyebrow={dict.meta.siteName} title={c.galleryTitle} />
-    <Gallery locale={locale} items={galleryItems} class="mt-12" />
+    <Gallery locale={locale} items={galleryItems} variant="balanced" class="mt-12" />
   </Section>
 </BaseLayout>
