@@ -14,6 +14,7 @@ export const site = {
   mapsUrl:
     'https://www.google.com/maps/search/?api=1&query=Vesla%C5%99sk%C3%A1%201039%2F144%2C%20Brno-Jundrov',
   virtualTourUrl: 'https://my.matterport.com/show/?m=wshBMwZgJWX',
+  homeVirtualTourUrl: 'https://my.matterport.com/show/?m=9TRujB6gbEi',
   foundingYear: 2024,
   lawFirm: 'Krejčí, Rajf & partneři, s.r.o.',
 } as const;

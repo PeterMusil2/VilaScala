@@ -2,9 +2,13 @@
 import { Image } from 'astro:assets';
 
 import pageHeroView from '../assets/images/page-hero-view.webp';
-import viewSvratka from '../assets/images/view-svratka.jpg';
-import terrace2 from '../assets/images/terrace-2.jpg';
-import rockGarden from '../assets/images/rock-garden.jpg';
+import aboutGreenery from '../assets/images/about-greenery.webp';
+import aboutRecreation from '../assets/images/about-recreation.webp';
+import aboutTransit from '../assets/images/about-transit.webp';
+import aboutSvratka from '../assets/images/about-svratka.webp';
+import aboutCycling from '../assets/images/about-cycling.webp';
+import aboutBoats from '../assets/images/about-boats.webp';
+import aboutCafe from '../assets/images/about-cafe.webp';
 
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Hero from '../components/Hero.astro';
@@ -21,6 +25,52 @@ interface Props {
 const { locale } = Astro.props;
 const dict = t(locale);
 const c = dict.about;
+const pillarImages = [
+  {
+    src: aboutGreenery,
+    alt: locale === 'cs'
+      ? 'Výhled z Veslařské do okolní zeleně'
+      : 'View from Veslařská across the surrounding greenery',
+  },
+  {
+    src: aboutRecreation,
+    alt: locale === 'cs'
+      ? 'Rekreační místo v zeleni poblíž Veslařské'
+      : 'A green recreation area near Veslařská',
+  },
+  {
+    src: aboutTransit,
+    alt: locale === 'cs'
+      ? 'Zastávka městské hromadné dopravy na Veslařské'
+      : 'Public transport stop on Veslařská',
+  },
+  {
+    src: aboutSvratka,
+    alt: locale === 'cs'
+      ? 'Klidný úsek řeky Svratky obklopený zelení'
+      : 'A quiet stretch of the Svratka river surrounded by greenery',
+  },
+];
+const locationImages = [
+  {
+    src: aboutCycling,
+    alt: locale === 'cs'
+      ? 'Cyklostezka podél řeky Svratky'
+      : 'Cycle path along the Svratka river',
+  },
+  {
+    src: aboutBoats,
+    alt: locale === 'cs'
+      ? 'Loděnice a kanoe v rekreačním areálu u Svratky'
+      : 'Boathouse and canoe at a recreation area by the Svratka',
+  },
+  {
+    src: aboutCafe,
+    alt: locale === 'cs'
+      ? 'Příjemné venkovní posezení v kavárně poblíž Jundrova'
+      : 'Welcoming outdoor café seating near Jundrov',
+  },
+];
 ---
 
 <BaseLayout
@@ -55,12 +105,27 @@ const c = dict.about;
 
   <Section tone="surface" labelledby="pillars-title">
     <SectionHeading id="pillars-title" index="02" eyebrow={dict.nav.about} title={c.pillarsTitle} />
-    <div class="mt-14 grid gap-x-12 gap-y-12 md:grid-cols-2">
+    <div class="mt-14 grid gap-12 lg:gap-14">
       {
         c.pillars.map((p, i) => (
-          <article class="reveal border-t border-line-strong pt-7" data-reveal-delay={(i % 2) * 80}>
-            <h3 class="text-2xl">{p.title}</h3>
-            <p class="mt-4 text-muted">{p.body}</p>
+          <article
+            class="reveal grid gap-6 border-t border-line-strong pt-7 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-center lg:gap-12"
+            data-reveal-delay={(i % 2) * 80}
+          >
+            <div class="order-2 lg:order-1">
+              <h3 class="text-2xl">{p.title}</h3>
+              <p class="mt-4 text-muted">{p.body}</p>
+            </div>
+            <Image
+              src={pillarImages[i].src}
+              alt={pillarImages[i].alt}
+              widths={[480, 760, 1100, 1500]}
+              sizes="(min-width: 1024px) 48vw, 92vw"
+              loading="lazy"
+              decoding="async"
+              quality={76}
+              class="order-1 aspect-[3/2] w-full rounded-card object-cover lg:order-2"
+            />
           </article>
         ))
       }
@@ -70,51 +135,31 @@ const c = dict.about;
   <Section labelledby="location-title">
     <SectionHeading id="location-title" index="03" eyebrow="Jundrov" title={c.locationTitle} lead={c.locationLead} />
 
-    <div class="mt-14 grid gap-12 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-16">
-      <div class="grid gap-10">
-        {
-          c.locationSections.map((s, i) => (
-            <article class="reveal" data-reveal-delay={i * 70}>
+    <div class="mt-14 grid gap-12 lg:gap-14">
+      {
+        c.locationSections.map((s, i) => (
+          <article
+            class="reveal grid gap-6 border-t border-line-strong pt-7 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-center lg:gap-12"
+            data-reveal-delay={i * 70}
+          >
+            <div class="order-2 lg:order-1">
               <h3 class="text-2xl">{s.title}</h3>
               <p class="mt-3 text-muted">{s.body}</p>
-            </article>
-          ))
-        }
-        <p class="reveal border-t border-line pt-7 font-display text-2xl">{c.closing}</p>
-      </div>
-
-      <div class="reveal grid gap-4 self-start sm:grid-cols-2 lg:grid-cols-1">
-        <Image
-          src={viewSvratka}
-          alt={locale === 'cs'
-            ? 'Výhled na meandr řeky Svratky a okolní zeleň'
-            : 'View over the meander of the Svratka river and the surrounding greenery'}
-          widths={[400, 700, 1000]}
-          sizes="(min-width: 1024px) 40vw, 46vw"
-          loading="lazy"
-          class="aspect-[3/2] w-full rounded-card object-cover"
-        />
-        <Image
-          src={terrace2}
-          alt={locale === 'cs'
-            ? 'Panoramatický pohled z terasy do zeleně'
-            : 'Panoramic view from the terrace into the greenery'}
-          widths={[400, 700, 1000]}
-          sizes="(min-width: 1024px) 40vw, 46vw"
-          loading="lazy"
-          class="aspect-[3/2] w-full rounded-card object-cover"
-        />
-        <Image
-          src={rockGarden}
-          alt={locale === 'cs'
-            ? 'Skalní zahrada s cortenovými prvky u domu'
-            : 'Rock garden with corten details beside the building'}
-          widths={[400, 700, 1000]}
-          sizes="(min-width: 1024px) 40vw, 46vw"
-          loading="lazy"
-          class="aspect-[3/2] w-full rounded-card object-cover sm:col-span-2 lg:col-span-1"
-        />
-      </div>
+            </div>
+            <Image
+              src={locationImages[i].src}
+              alt={locationImages[i].alt}
+              widths={[480, 760, 1100, 1500]}
+              sizes="(min-width: 1024px) 48vw, 92vw"
+              loading="lazy"
+              decoding="async"
+              quality={76}
+              class="order-1 aspect-[3/2] w-full rounded-card object-cover lg:order-2"
+            />
+          </article>
+        ))
+      }
+      <p class="reveal border-t border-line pt-7 font-display text-2xl">{c.closing}</p>
     </div>
   </Section>
 </BaseLayout>

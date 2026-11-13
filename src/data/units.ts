@@ -106,7 +106,7 @@ export const units: Unit[] = [
     plan: plan2,
     gallery: [unit2Living, terrace2, rockGarden, cortenPlanters, wine1],
     pdf: withBase('/docs/vila-scala-jednotka-1039-2.pdf'),
-    virtualTourUrl: 'https://my.matterport.com/show/?m=wshBMwZgJWX',
+    virtualTourUrl: 'https://my.matterport.com/show/?m=aoyxHcrqaw6',
   },
   {
     slug: '1039-3',
