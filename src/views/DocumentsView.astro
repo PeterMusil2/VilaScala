@@ -65,7 +65,7 @@ const c = dict.documents;
 
   <Section tone="surface" labelledby="certs-title">
     <SectionHeading id="certs-title" index="02" eyebrow={dict.nav.documents} title={c.energyTitle} lead={c.energyBody} />
-    <ul class="mt-12 grid gap-4 sm:grid-cols-2">
+    <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <li>
         <DownloadCard
           locale={locale}
@@ -81,6 +81,15 @@ const c = dict.documents;
           title={c.standardsFile}
           meta="PDF"
           index={1}
+        />
+      </li>
+      <li>
+        <DownloadCard
+          locale={locale}
+          href={withBase("/docs/vila-scala-moznosti-dokonceni.pdf")}
+          title={c.completionFile}
+          meta="PDF"
+          index={2}
         />
       </li>
     </ul>

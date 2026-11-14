@@ -43,28 +43,24 @@ const c = dict.pricing;
     <UnitsTable locale={locale} class="mt-10" />
 
     <h3 class="reveal mt-16 text-2xl">{c.parkingTitle}</h3>
-    <div class="reveal mt-6 overflow-x-auto">
-      <table class="w-full min-w-[30rem] border-collapse text-left text-sm">
-        <caption class="sr-only">{c.tableCaption}</caption>
-        <thead>
-          <tr class="border-b border-line-strong">
-            <th scope="col" class="py-3 pr-4 font-semibold">{c.colItem}</th>
-            <th scope="col" class="py-3 pr-4 font-semibold">{c.colSpec}</th>
-            <th scope="col" class="py-3 text-right font-semibold">{c.colPrice}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            c.parking.map((p) => (
-              <tr class="border-b border-line">
-                <th scope="row" class="py-4 pr-4 font-medium">{p.name}</th>
-                <td class="py-4 pr-4 text-muted">{p.spec}</td>
-                <td class="py-4 text-right font-medium whitespace-nowrap tabular-nums">{p.price}</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
+    <div class="reveal mt-6 grid gap-4" aria-label={c.tableCaption}>
+      {
+        c.parking.map((p) => (
+          <article class="rounded-card border border-line bg-elevated p-5 sm:p-7">
+            <h4 class="font-medium">{p.name}</h4>
+            <dl class="mt-3 grid gap-0 text-sm">
+              <div class="flex items-baseline justify-between gap-4 border-b border-line py-3">
+                <dt class="text-muted">{c.colSpec}</dt>
+                <dd class="text-right">{p.spec}</dd>
+              </div>
+              <div class="flex items-baseline justify-between gap-4 py-3">
+                <dt class="text-muted">{c.colPrice}</dt>
+                <dd class="font-medium whitespace-nowrap tabular-nums">{p.price}</dd>
+              </div>
+            </dl>
+          </article>
+        ))
+      }
     </div>
     <p class="reveal mt-4 text-sm text-muted">{c.parkingNote}</p>
 
@@ -89,6 +85,7 @@ const c = dict.pricing;
     <p class="reveal mt-10 font-display text-2xl">{c.standardsClosing}</p>
     <div class="reveal mt-8 flex flex-wrap gap-3">
       <Button href={withBase("/docs/vila-scala-standardy.pdf")} download>{dict.documents.standardsFile}</Button>
+      <Button href={withBase("/docs/vila-scala-moznosti-dokonceni.pdf")} download variant="secondary">{dict.documents.completionFile}</Button>
       <Button href={path('contact', locale)} variant="secondary">{dict.cta.contactUs}</Button>
     </div>
   </Section>

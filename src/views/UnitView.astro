@@ -95,15 +95,16 @@ const specs = [
   { label: dict.units.layout, value: unit.layout },
   { label: dict.units.floor, value: unit.floorLabel[locale] },
   { label: dict.units.floorArea, value: `${nf.format(unit.areas.floor)} m²` },
-  { label: dict.units.usableArea, value: `${nf.format(unit.areas.usable)} m²` },
-  { label: dict.units.totalUsableArea, value: `${nf.format(unit.areas.totalUsable)} m²` },
+  { label: dict.units.cleanInternalArea, value: `${nf.format(unit.areas.usable)} m²` },
+  { label: dict.units.exclusiveOutdoorArea, value: `${nf.format(unit.outdoorTotal)} m²` },
+  { label: dict.units.totalAreaIncludingOutdoor, value: `${nf.format(unit.areas.totalUsable)} m²` },
   ...(unit.studio ? [{ label: dict.units.designStudio, value: unit.studio }] : []),
 ];
 
 const others = units.filter((u) => u.slug !== unit.slug).slice(0, 3);
 
 const seoTitle = `${heading}, ${unit.layout} — ${site.name}`;
-const seoDescription = `${c.lead} ${dict.units.totalUsableArea}: ${nf.format(unit.areas.totalUsable)} m². ${unit.price ? `${dict.units.price}: ${cf.format(unit.price)}.` : ''}`.trim();
+const seoDescription = `${c.lead} ${dict.units.totalAreaIncludingOutdoor}: ${nf.format(unit.areas.totalUsable)} m². ${unit.price ? `${dict.units.price}: ${cf.format(unit.price)}.` : ''}`.trim();
 
 const schema = [
   {
@@ -290,9 +291,9 @@ const additionalVisualisationFull = await Promise.all(
           <dl class="mt-5 grid gap-3 text-sm">
             {
               specs.map((s) => (
-                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3 last:border-0 last:pb-0">
+                <div class="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-x-4 border-b border-line pb-3 last:border-0 last:pb-0">
                   <dt class="text-muted">{s.label}</dt>
-                  <dd class="text-right font-medium">{s.value}</dd>
+                  <dd class="text-right font-medium whitespace-nowrap tabular-nums">{s.value}</dd>
                 </div>
               ))
             }

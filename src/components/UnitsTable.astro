@@ -20,61 +20,60 @@ const cf = new Intl.NumberFormat(locale === 'cs' ? 'cs-CZ' : 'en-GB', {
 });
 ---
 
-<!-- Wide data needs a scroll container of its own; the page never scrolls sideways. -->
-<div class:list={['reveal -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0', className]}>
-  <table class="w-full min-w-[46rem] border-collapse text-left text-sm">
-    <caption class="sr-only">{c.tableCaption}</caption>
-    <thead>
-      <tr class="border-b border-line-strong">
-        <th scope="col" class="py-3 pr-4 font-semibold">{c.colUnit}</th>
-        <th scope="col" class="py-3 pr-4 font-semibold">{c.colLayout}</th>
-        <th scope="col" class="py-3 pr-4 font-semibold">{c.colFloor}</th>
-        <th scope="col" class="py-3 pr-4 text-right font-semibold">{c.colArea}</th>
-        <th scope="col" class="py-3 pr-4 text-right font-semibold">{c.colOutdoor}</th>
-        <th scope="col" class="py-3 pr-4 font-semibold">{c.colPrice}</th>
-        <th scope="col" class="py-3 font-semibold"><span class="sr-only">{c.colDetail}</span></th>
-      </tr>
-    </thead>
-    <tbody>
-      {
-        units.map((u) => (
-          <tr class="border-b border-line align-middle">
-            <th scope="row" class="py-4 pr-4 font-medium whitespace-nowrap">
-              {u.number}
-            </th>
-            <td class="py-4 pr-4 whitespace-nowrap">{u.layout}</td>
-            <td class="py-4 pr-4 whitespace-nowrap text-muted">{u.floorLabel[locale]}</td>
-            <td class="py-4 pr-4 text-right whitespace-nowrap tabular-nums">
-              {nf.format(u.areas.floor)} m²
-            </td>
-            <td class="py-4 pr-4 text-right whitespace-nowrap tabular-nums">
-              {nf.format(u.outdoorTotal)} m²
-            </td>
-            <td class="py-4 pr-4">
+<div class:list={['reveal grid gap-4', className]} aria-label={c.tableCaption}>
+  {
+    units.map((u) => (
+      <article class="rounded-card border border-line bg-elevated p-5 shadow-[var(--shadow-raise)] sm:p-7">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-4">
+          <div>
+            <p class="text-sm text-muted">{dict.units.labelUnit}</p>
+            <h3 class="mt-1 font-display text-2xl text-text">{u.number}</h3>
+          </div>
+          <div class="text-right">
+            <p class="text-sm text-muted">{c.colPrice}</p>
+            <div class="mt-1 font-display text-xl text-accent-text sm:text-2xl">
               {u.price ? (
-                <span class="font-medium whitespace-nowrap">{cf.format(u.price)}</span>
+                <span class="whitespace-nowrap tabular-nums">{cf.format(u.price)}</span>
               ) : (
                 <StatusBadge locale={locale} status={u.status} short />
               )}
-            </td>
-            <td class="py-4 text-right">
-              <a
-                href={path('unit', locale, u.slug)}
-                class="inline-flex min-h-11 items-center gap-1.5 font-medium text-accent-text underline-offset-4 hover:underline"
-              >
-                {dict.cta.viewUnit}
-                <span class="sr-only">
-                  {' '}
-                  {dict.units.labelUnit} {u.number} — {copy[u.slug as '1039-1'].title}
-                </span>
-                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M5 12h14m0 0-5-5m5 5-5 5" />
-                </svg>
-              </a>
-            </td>
-          </tr>
-        ))
-      }
-    </tbody>
-  </table>
+            </div>
+          </div>
+        </div>
+
+        <dl class="mt-4 grid gap-0 text-sm">
+          <div class="flex items-baseline justify-between gap-4 border-b border-line py-3">
+            <dt class="text-muted">{c.colLayout}</dt>
+            <dd class="font-medium">{u.layout}</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 border-b border-line py-3">
+            <dt class="text-muted">{c.colFloor}</dt>
+            <dd class="font-medium">{u.floorLabel[locale]}</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 border-b border-line py-3">
+            <dt class="text-muted">{c.colArea}</dt>
+            <dd class="font-medium whitespace-nowrap tabular-nums">{nf.format(u.areas.floor)} m²</dd>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 py-3">
+            <dt class="text-muted">{c.colOutdoor}</dt>
+            <dd class="font-medium whitespace-nowrap tabular-nums">{nf.format(u.outdoorTotal)} m²</dd>
+          </div>
+        </dl>
+
+        <a
+          href={path('unit', locale, u.slug)}
+          class="mt-3 inline-flex min-h-11 items-center gap-1.5 font-medium text-accent-text underline-offset-4 hover:underline"
+        >
+          {dict.cta.viewUnit}
+          <span class="sr-only">
+            {' '}
+            {dict.units.labelUnit} {u.number} — {copy[u.slug as '1039-1'].title}
+          </span>
+          <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14m0 0-5-5m5 5-5 5" />
+          </svg>
+        </a>
+      </article>
+    ))
+  }
 </div>
